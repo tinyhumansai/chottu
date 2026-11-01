@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --config src-react/vite.config.ts",
-    "build": "tsc -p src-react && vite build --config src-react/vite.config.ts",
-    "preview": "vite preview --config src-react/vite.config.ts",
+    "dev": "pnpm --filter chottu-react dev",
+    "build": "pnpm --filter chottu-react build",
+    "preview": "pnpm --filter chottu-react preview",
     "tauri": "tauri",
     "desktop": "cross-env TAURI_APP_PATH=src-tauri-desktop TAURI_FRONTEND_PATH=. tauri",
     "mobile": "cross-env TAURI_APP_PATH=src-tauri-mobile TAURI_FRONTEND_PATH=. tauri",
@@ -19,31 +19,8 @@
     "ios:dev": "pnpm mobile ios dev",
     "ios:build": "pnpm mobile ios build"
   },
-  "dependencies": {
-    "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-autostart": "~2.7.0",
-    "@tauri-apps/plugin-clipboard-manager": "~2.5.0",
-    "@tauri-apps/plugin-deep-link": "~2.6.3",
-    "@tauri-apps/plugin-dialog": "~2.8.4",
-    "@tauri-apps/plugin-fs": "~2.7.1",
-    "@tauri-apps/plugin-global-shortcut": "~2.4.1",
-    "@tauri-apps/plugin-log": "~2.10.1",
-    "@tauri-apps/plugin-notification": "~2.8.0",
-    "@tauri-apps/plugin-opener": "^2",
-    "@tauri-apps/plugin-os": "~2.4.0",
-    "@tauri-apps/plugin-process": "~2.4.0",
-    "@tauri-apps/plugin-store": "~2.5.0",
-    "@tauri-apps/plugin-window-state": "~2.5.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
-  },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@vitejs/plugin-react": "^6.0.2",
-    "cross-env": "^10.1.0",
-    "typescript": "~6.0.3",
-    "vite": "^8.0.16"
+    "cross-env": "^10.1.0"
   }
 }
