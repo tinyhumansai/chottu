@@ -14,6 +14,8 @@
     "dialog:default",
     "fs:default",
     "os:default",
-    "clipboard-manager:default"
+    "clipboard-manager:default",
+    "process:default",
+    "deep-link:default"
   ]
 }

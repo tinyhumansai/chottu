@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "chottu",
+  "productName": "Chottu",
   "version": "0.1.0",
   "identifier": "ai.tinyhumans.chottu",
   "build": {
@@ -12,13 +12,17 @@
   "app": {
     "windows": [
       {
-        "title": "chottu",
-        "width": 800,
-        "height": 600
+        "title": "Chottu",
+        "width": 1024,
+        "height": 720,
+        "label": "main",
+        "minWidth": 480,
+        "minHeight": 360,
+        "center": true
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' asset: http://asset.localhost data:; style-src 'self' 'unsafe-inline'; connect-src ipc: http://ipc.localhost"
     }
   },
   "bundle": {
@@ -31,5 +35,14 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "deep-link": {
+      "desktop": {
+        "schemes": [
+          "chottu"
+        ]
+      }
+    }
   }
 }
