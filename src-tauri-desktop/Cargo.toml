@@ -1,0 +1,33 @@
+[package]
+name = "chottu-desktop"
+description = "Chottu desktop app (macOS, Windows, Linux)"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "chottu"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { workspace = true }
+
+[dependencies]
+tauri = { workspace = true, features = ["tray-icon"] }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+tauri-plugin-log = { workspace = true }
+tauri-plugin-opener = { workspace = true }
+tauri-plugin-store = { workspace = true }
+tauri-plugin-notification = { workspace = true }
+tauri-plugin-dialog = { workspace = true }
+tauri-plugin-fs = { workspace = true }
+tauri-plugin-os = { workspace = true }
+tauri-plugin-clipboard-manager = { workspace = true }
+tauri-plugin-deep-link = { workspace = true }
+tauri-plugin-process = { workspace = true }
+tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
+tauri-plugin-window-state = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-autostart = "2"

@@ -1,0 +1,33 @@
+[workspace]
+resolver = "3"
+members = ["src-tauri-desktop", "src-tauri-mobile"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["tinyhumans.ai"]
+
+[workspace.dependencies]
+tauri = "2"
+tauri-build = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+log = "0.4"
+tauri-plugin-log = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-store = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-os = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-deep-link = "2"
+tauri-plugin-process = "2"
+
+# Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true
