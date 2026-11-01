@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capability for the main window",
+  "description": "Capability for the main desktop window",
   "windows": [
     "main"
   ],
@@ -16,6 +16,14 @@
     "os:default",
     "clipboard-manager:default",
     "process:default",
-    "deep-link:default"
+    "deep-link:default",
+    "window-state:default",
+    "global-shortcut:default",
+    "autostart:default"
+  ],
+  "platforms": [
+    "macOS",
+    "windows",
+    "linux"
   ]
 }
