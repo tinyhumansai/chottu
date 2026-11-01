@@ -1,33 +1,70 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
+import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
+import { getVersion } from "@tauri-apps/api/app";
+import { platform, arch } from "@tauri-apps/plugin-os";
+import { load } from "@tauri-apps/plugin-store";
+import { open } from "@tauri-apps/plugin-dialog";
+import { writeText } from "@tauri-apps/plugin-clipboard-manager";
+import {
+  isPermissionGranted,
+  requestPermission,
+  sendNotification,
+} from "@tauri-apps/plugin-notification";
+import { onOpenUrl } from "@tauri-apps/plugin-deep-link";
+import { info } from "@tauri-apps/plugin-log";
 import "./App.css";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
   const [name, setName] = useState("");
+  const [greeting, setGreeting] = useState("");
+  const [launches, setLaunches] = useState<number>();
+  const [env, setEnv] = useState("");
+  const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      setEnv(`v${await getVersion()} · ${platform()} / ${arch()}`);
+
+      const store = await load("settings.json");
+      const count = ((await store.get<number>("launches")) ?? 0) + 1;
+      await store.set("launches", count);
+      setLaunches(count);
+      info(`launch #${count}`);
+    })();
+
+    const unlisten = onOpenUrl((urls) => setStatus(`Opened via ${urls.join(", ")}`));
+    return () => {
+      unlisten.then((fn) => fn());
+    };
+  }, []);
 
   async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
+    setGreeting(await invoke<string>("greet", { name }));
+  }
+
+  async function notify() {
+    let granted = await isPermissionGranted();
+    if (!granted) granted = (await requestPermission()) === "granted";
+    if (granted) sendNotification({ title: "Chottu", body: "Hello from Tauri!" });
+    setStatus(granted ? "Notification sent" : "Notification permission denied");
+  }
+
+  async function pickFile() {
+    const file = await open({ multiple: false, directory: false });
+    setStatus(file ? `Picked ${file}` : "No file picked");
+  }
+
+  async function copy() {
+    await writeText(greeting || "Chottu");
+    setStatus("Copied to clipboard");
   }
 
   return (
     <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
+      <h1>Chottu</h1>
+      <p className="muted">
+        {env} · launch #{launches ?? "…"}
+      </p>
 
       <form
         className="row"
@@ -43,7 +80,14 @@ function App() {
         />
         <button type="submit">Greet</button>
       </form>
-      <p>{greetMsg}</p>
+      <p>{greeting}</p>
+
+      <div className="row">
+        <button onClick={notify}>Notify</button>
+        <button onClick={pickFile}>Pick file</button>
+        <button onClick={copy}>Copy</button>
+      </div>
+      <p className="muted">{status}</p>
     </main>
   );
 }

@@ -114,3 +114,12 @@ button {
     background-color: #0f0f0f69;
   }
 }
+
+.muted {
+  opacity: 0.6;
+  font-size: 0.9em;
+}
+
+.row button + button {
+  margin-left: 0.5em;
+}

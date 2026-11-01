@@ -67,9 +67,9 @@ fn focus_main_window(app: &tauri::AppHandle) {
 #[cfg(desktop)]
 mod tray {
     use tauri::{
+        AppHandle,
         menu::{Menu, MenuItem},
         tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
-        AppHandle,
     };
 
     pub fn create(app: &AppHandle) -> tauri::Result<()> {
