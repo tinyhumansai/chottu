@@ -17,9 +17,5 @@
     "clipboard-manager:default",
     "process:default",
     "deep-link:default"
-  ],
-  "platforms": [
-    "android",
-    "iOS"
   ]
 }
