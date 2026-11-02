@@ -17,6 +17,7 @@ import {
   AttachmentPrimitive,
   ComposerPrimitive,
   MessagePrimitive,
+  useAuiState,
 } from "@assistant-ui/react";
 import {
   Tooltip,
