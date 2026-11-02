@@ -1,33 +1,17 @@
-import { useEffect } from "react";
-import {
-  AssistantRuntimeProvider,
-  useExternalStoreRuntime,
-  type AppendMessage,
-  type ThreadMessageLike,
-} from "@assistant-ui/react";
-import { SquarePen } from "lucide-react";
-import { Thread } from "@/components/assistant-ui/elements/thread.aui";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import { MessageCircle, Settings } from "lucide-react";
+import { BottomBar, type Tab } from "@/components/bottom-bar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useChatStore, type ChatMessage } from "@/store/chat";
+import { useDeepLinkMessages } from "@/hooks/use-deep-link-messages";
+import { ChatScreen } from "@/screens/chat-screen";
+import { SettingsScreen } from "@/screens/settings-screen";
 
-const convertMessage = (m: ChatMessage, idx: number, last: number, running: boolean): ThreadMessageLike => ({
-  id: m.id,
-  role: m.role,
-  content: [{ type: "text", text: m.text }],
-  createdAt: new Date(m.createdAt),
-  ...(m.role === "assistant" && {
-    status:
-      running && idx === last
-        ? { type: "running" }
-        : m.error
-          ? { type: "incomplete", reason: m.error === "cancelled" ? "cancelled" : "error" }
-          : { type: "complete", reason: "stop" },
-  }),
-});
+type TabId = "chat" | "settings";
 
-const textOf = (message: AppendMessage) =>
-  message.content.map((p) => (p.type === "text" ? p.text : "")).join("");
+const TABS: readonly Tab<TabId>[] = [
+  { id: "chat", label: "Chat", icon: MessageCircle },
+  { id: "settings", label: "Settings", icon: Settings },
+];
 
 function useSystemTheme() {
   useEffect(() => {
@@ -41,33 +25,17 @@ function useSystemTheme() {
 
 export default function App() {
   useSystemTheme();
-  const { messages, isRunning, send, regenerate, cancel, clear } = useChatStore();
-
-  const runtime = useExternalStoreRuntime({
-    messages,
-    isRunning,
-    convertMessage: (m, idx) => convertMessage(m, idx, messages.length - 1, isRunning),
-    onNew: (message) => send(textOf(message)),
-    onReload: (parentId) => regenerate(parentId),
-    onCancel: async () => cancel(),
-  });
+  useDeepLinkMessages();
+  const [tab, setTab] = useState<TabId>("chat");
 
   return (
     <TooltipProvider>
-      <AssistantRuntimeProvider runtime={runtime}>
-        <div className="bg-background text-foreground flex h-dvh flex-col">
-          <header className="flex items-center justify-between border-b px-4 py-2">
-            <span className="font-semibold">Chottu</span>
-            <Button variant="ghost" size="sm" onClick={clear} disabled={messages.length === 0}>
-              <SquarePen />
-              New chat
-            </Button>
-          </header>
-          <main className="min-h-0 flex-1">
-            <Thread />
-          </main>
-        </div>
-      </AssistantRuntimeProvider>
+      <div className="bg-background text-foreground flex h-dvh flex-col">
+        <main className="flex min-h-0 flex-1 flex-col">
+          {tab === "chat" ? <ChatScreen /> : <SettingsScreen />}
+        </main>
+        <BottomBar tabs={TABS} active={tab} onChange={setTab} />
+      </div>
     </TooltipProvider>
   );
 }
