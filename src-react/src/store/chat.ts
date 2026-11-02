@@ -68,24 +68,39 @@ export const useChatStore = create<ChatState>()(
       const patch = (id: string, fn: (m: ChatMessage) => ChatMessage) =>
         set((s) => ({ messages: s.messages.map((m) => (m.id === id ? fn(m) : m)) }));
 
-      /** Streams an assistant reply to the current history. */
+      /**
+       * Streams an assistant reply to the current history. Each run owns its
+       * controller, so a newer run can stop an older one without either
+       * clearing the other's state.
+       */
       const reply = async () => {
+        const run = new AbortController();
+        controller = run;
         const history: ChatTurn[] = get().messages.map((m) => ({ role: m.role, text: textOf(m) }));
         const draft = toMessage({ role: "assistant", content: [] });
         set((s) => ({ messages: [...s.messages, draft], isRunning: true }));
 
-        controller = new AbortController();
         try {
-          for await (const chunk of backend.streamReply(history, controller.signal)) {
+          for await (const chunk of backend.streamReply(history, run.signal)) {
+            if (run.signal.aborted) break;
             patch(draft.id, (m) => appendText(m, chunk));
           }
+          if (run.signal.aborted) patch(draft.id, (m) => ({ ...m, error: "cancelled" }));
         } catch (err) {
-          const reason = controller.signal.aborted ? "cancelled" : String(err);
+          const reason = run.signal.aborted ? "cancelled" : String(err);
           patch(draft.id, (m) => ({ ...m, error: reason }));
         } finally {
-          controller = null;
-          set({ isRunning: false });
+          if (controller === run) {
+            controller = null;
+            set({ isRunning: false });
+          }
         }
+      };
+
+      /** Stops the reply in flight, if any; its draft is kept and marked cancelled. */
+      const stop = () => {
+        controller?.abort();
+        controller = null;
       };
 
       return {
@@ -99,24 +114,26 @@ export const useChatStore = create<ChatState>()(
         },
 
         async send(content) {
-          if (get().isRunning) return;
+          // A new message wins over a reply still streaming (e.g. "Ask Chottu" from another tab).
+          stop();
           get().register({ role: "user", content });
           await reply();
         },
 
         async regenerate(parentId) {
-          if (get().isRunning) return;
+          stop();
           const idx = get().messages.findIndex((m) => m.id === parentId);
           set((s) => ({ messages: s.messages.slice(0, idx + 1) }));
           await reply();
         },
 
         cancel() {
-          controller?.abort();
+          stop();
+          set({ isRunning: false });
         },
 
         clear() {
-          controller?.abort();
+          stop();
           set({ messages: [], isRunning: false });
         },
       };
