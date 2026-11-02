@@ -35,21 +35,19 @@ export function GluestackUIProvider({
   useSafeLayoutEffect(() => {
     if (mode !== 'system') return;
     const media = window.matchMedia('(prefers-color-scheme: dark)');
+    // Chottu: apply the OS scheme now too, not only when it next changes.
+    const initial = media.matches ? 'dark' : 'light';
+    script(initial);
+    Uniwind.setTheme(initial);
     media.addListener(handleMediaQuery);
     return () => media.removeListener(handleMediaQuery);
   }, [handleMediaQuery, mode]);
 
   return (
-    <>
-      <script
-        suppressHydrationWarning
-        dangerouslySetInnerHTML={{
-          __html: `(${script.toString()})('${mode}')`,
-        }}
-      />
-      <OverlayProvider>
-        <ToastProvider>{props.children}</ToastProvider>
-      </OverlayProvider>
-    </>
+    // Chottu: no inline <script>; the web build is a client-rendered SPA, where
+    // React never runs it and warns. The layout effects above set the theme.
+    <OverlayProvider>
+      <ToastProvider>{props.children}</ToastProvider>
+    </OverlayProvider>
   );
 }

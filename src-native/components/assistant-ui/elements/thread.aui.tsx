@@ -673,7 +673,7 @@ const DefaultComposerInput: FC = () => {
     <ComposerPrimitive.Input
       placeholder="Message Chottu"
       placeholderTextColorClassName={
-        hydrated ? "accent-muted-foreground/60" : undefined
+        hydrated ? "accent-muted-foreground" : undefined // Chottu: Uniwind cannot extract an accent colour with an opacity modifier
       }
       // Chottu: one line tall until you type more.
       className="aui-composer-input text-foreground web:resize-none web:outline-none max-h-36 min-h-9 flex-1 px-3 py-1.5 text-base leading-6"

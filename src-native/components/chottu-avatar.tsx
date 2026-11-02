@@ -6,7 +6,7 @@ import Svg, { Circle, Defs, Path, RadialGradient, Stop } from "react-native-svg"
  */
 export function ChottuAvatar({ size = 40 }: { size?: number }) {
   return (
-    <Svg width={size} height={size} viewBox="0 0 40 40" accessible={false}>
+    <Svg width={size} height={size} viewBox="0 0 40 40">
       <Defs>
         <RadialGradient id="chottu-avatar-fill" cx="35%" cy="30%" r="75%">
           <Stop offset="0%" stopColor="#fff4e6" />
