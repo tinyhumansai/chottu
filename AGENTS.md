@@ -157,7 +157,7 @@ TypeScript:
 Rust:
 
 - Standard `rustfmt` output and Rust 2024 idioms.
-- Keep the shells thin. A Tauri command does one small job and returns typed
+- Keep the desktop shell thin. A Tauri command does one small job and returns typed
   data; anything bigger belongs in a library crate, not in `main.rs` or
   `lib.rs`.
 - Every Tauri command is listed in `generate_handler!` and needs a matching
