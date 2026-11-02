@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getVersion } from "@tauri-apps/api/app";
 import { isTauri } from "@tauri-apps/api/core";
+import { BOTTOM_BAR_SPACE } from "@/components/bottom-bar";
 import { Button } from "@/components/ui/button";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -50,7 +51,9 @@ export function SettingsScreen() {
   }, []);
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 overflow-y-auto px-4 pt-[calc(1.5rem+env(safe-area-inset-top))] pb-4">
+    <div className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-6 overflow-y-auto px-4 pt-[calc(1.5rem+env(safe-area-inset-top))]"
+      style={{ paddingBottom: `calc(${BOTTOM_BAR_SPACE} + 1rem)` }}
+    >
       <h1 className="text-2xl font-semibold">Settings</h1>
       <section className="flex flex-col gap-3 rounded-xl border p-4">
         <p className="font-medium">Appearance</p>

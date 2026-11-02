@@ -99,7 +99,10 @@ src-tauri-mobile/          # crate `chottu-mobile`, lib `chottu_mobile_lib`
 - Import through the `@/` alias, not long relative paths.
 - Style with Tailwind classes and the theme tokens in `index.css`. Do not add
   hard-coded colours; light and dark both come from the tokens (add a token,
-  with a value in both themes, as was done for `bubble-user`).
+  with a value in both themes, as was done for `bubble-user`,
+  `bubble-assistant` and `chat-bg`). The chat wallpaper is the `.chat-wallpaper`
+  class in `index.css`; its doodle tile is an inline SVG data URL, so use
+  single quotes inside it.
 - Dark mode is the `dark` class on `<html>`, set by `useApplyTheme` from the
   theme store. Do not read `prefers-color-scheme` anywhere else.
 - There is no header bar. The chat screen has a floating `TopBar` (Chottu's

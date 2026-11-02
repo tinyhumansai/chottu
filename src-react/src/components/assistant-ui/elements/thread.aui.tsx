@@ -266,8 +266,8 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean }> = ({
 
           <ThreadPrimitive.ViewportFooter
             className={cn(
-              // Chottu: small bottom gap; the floating bottom bar sits right below.
-              "aui-thread-viewport-footer flex flex-col gap-4 overflow-visible pb-2",
+              // Chottu: the thread runs under the floating bottom bar; lift the composer above it.
+              "aui-thread-viewport-footer flex flex-col gap-4 overflow-visible pb-[calc(var(--thread-bottom-inset,0px)+0.5rem)]",
               !isEmpty &&
                 "sticky bottom-0 mt-auto rounded-t-(--composer-radius)",
             )}
@@ -885,7 +885,7 @@ const UserMessage: FC = () => {
       <UserMessageAttachments />
 
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-        <div className="aui-user-message-content peer bg-bubble-user text-bubble-user-foreground rounded-[1.25rem] px-4 py-2.5 wrap-break-word empty:hidden">
+        <div className="aui-user-message-content peer bg-bubble-user text-bubble-user-foreground rounded-[1.25rem] shadow-[0_1px_1px_rgb(0_0_0/0.08)] px-4 py-2.5 wrap-break-word empty:hidden">
           <MessagePrimitive.Parts
             components={{ File: UserFilePart, Image: UserImagePart }}
           />
