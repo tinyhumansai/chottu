@@ -42,7 +42,7 @@ export const useIdeasStore = create<IdeasState>()((set) => ({
     set((s) => ({ ideas: update(s.ideas, id, (i) => (i.kind === "notification" ? { ...i, read: true } : i)) })),
 }));
 
-export const selectByKind = <K extends Idea["kind"]>(kind: K) => (s: IdeasState) =>
+export const selectByKind = <K extends Idea["kind"]>(kind: K) => (s: Pick<IdeasState, "ideas">) =>
   s.ideas.filter((i): i is Extract<Idea, { kind: K }> => i.kind === kind).sort((a, b) => b.at - a.at);
 
 /** Badge count for the nav: suggestions waiting plus unread notifications. */

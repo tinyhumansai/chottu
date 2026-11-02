@@ -18,9 +18,9 @@ const selectNotifications = selectByKind("notification");
 export function IdeasScreen() {
   const ideas = useIdeasStore((s) => s.ideas);
   const { dismiss, toggleSchedule, markRead } = useIdeasStore.getState();
-  const suggestions = selectSuggestions({ ideas } as Parameters<typeof selectSuggestions>[0]);
-  const schedules = selectSchedules({ ideas } as Parameters<typeof selectSchedules>[0]);
-  const notifications = selectNotifications({ ideas } as Parameters<typeof selectNotifications>[0]);
+  const suggestions = selectSuggestions({ ideas });
+  const schedules = selectSchedules({ ideas });
+  const notifications = selectNotifications({ ideas });
 
   return (
     <Page title="Ideas" subtitle="What Chottu noticed, and what it runs for you.">
