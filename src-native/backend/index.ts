@@ -27,8 +27,8 @@ export const mockBackend: ChatBackend = {
   async *streamReply(history, signal) {
     const last = history.findLast((t) => t.role === "user")?.text ?? "";
     const reply = last.startsWith("[voice note")
-      ? `Got your voice note 🎙️ (${last.slice(12, -1)}). I'll be able to listen once a real model is plugged into \`src/backend\`.`
-      : `You said: **${last}**\n\nThis is a mock reply. Plug a real model into \`src/backend\`.`;
+      ? `Got your voice note 🎙️ (${last.slice(12, -1)}). I'll be able to listen once a real model is plugged into \`src-native/backend\`.`
+      : `You said: **${last}**\n\nThis is a mock reply. Plug a real model into \`src-native/backend\`.`;
     for (const word of reply.split(/(?<=\s)/)) {
       await sleep(30, signal);
       yield word;

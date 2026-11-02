@@ -29,7 +29,9 @@ export function ChatWallpaper({ children }: { children?: ReactNode }) {
   const stroke = String(useCSSVariable("--color-chat-pattern") ?? "transparent");
   return (
     <View className="bg-chat-bg flex-1">
-      <Svg style={StyleSheet.absoluteFill} pointerEvents="none">
+      {/* The wrapper does the sizing: on web an Svg ignores absolute-fill styles and keeps its default height. */}
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+      <Svg width="100%" height="100%">
         <Defs>
           <Pattern id="chottu-doodles" width={160} height={160} patternUnits="userSpaceOnUse">
             {DOODLES.map((d) => (
@@ -42,6 +44,7 @@ export function ChatWallpaper({ children }: { children?: ReactNode }) {
         </Defs>
         <Rect width="100%" height="100%" fill="url(#chottu-doodles)" />
       </Svg>
+      </View>
       {children}
     </View>
   );
