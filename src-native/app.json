@@ -1,29 +1,32 @@
 {
   "expo": {
-    "name": "with-expo",
-    "slug": "with-expo",
-    "version": "0.0.0",
-    "orientation": "portrait",
+    "name": "Chottu",
+    "slug": "chottu",
+    "version": "0.1.0",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
-    "scheme": "withexpo",
+    "scheme": "chottu",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.assistant-ui.with-expo"
+      "bundleIdentifier": "ai.tinyhumans.chottu",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Chottu records voice notes and listens on calls when you ask it to."
+      }
     },
     "android": {
+      "package": "ai.tinyhumans.chottu",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#EFEAE2",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
+      "permissions": ["android.permission.RECORD_AUDIO"],
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -34,14 +37,15 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
-          "dark": {
-            "backgroundColor": "#18181b"
-          }
+          "backgroundColor": "#EFEAE2",
+          "dark": { "backgroundColor": "#0E171C" }
         }
       ],
       "expo-status-bar",
-      ["expo-build-properties", { "ios": { "enableSceneSupport": true } }]
+      [
+        "expo-audio",
+        { "microphonePermission": "Chottu records voice notes and listens on calls when you ask it to." }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
