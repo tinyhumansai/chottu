@@ -28,15 +28,32 @@ import { Icon } from "@/components/ui/icon";
 import toolkit from "@/components/tools";
 import { useAppRuntime } from "@/hooks/use-app-runtime";
 
+import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
+import '@/global.css';
+import { SafeAreaListener } from 'react-native-safe-area-context';
+import { Uniwind } from 'uniwind';
+
 function NewChatButton() {
   const aui = useAui();
 
   return (
-    <Pressable
+    
+    <SafeAreaListener
+      onChange={({ insets }) => {
+        Uniwind.updateInsets(insets);
+      }}
+    >
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <GluestackUIProvider mode="dark">
+          <Pressable
       accessibilityLabel="New chat"
       accessibilityRole="button"
       hitSlop={8}
-      onPress={() => aui.threads.switchToNewThread()}
+      onPress={() => aui.threads.switchToNewThread(
+        </GluestackUIProvider>
+      </GestureHandlerRootView>
+    </SafeAreaListener>
+  )}
       className="mr-4"
     >
       <Icon as={SquarePenIcon} className="text-foreground size-[22px]" />
