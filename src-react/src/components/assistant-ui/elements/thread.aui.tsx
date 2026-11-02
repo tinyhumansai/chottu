@@ -577,7 +577,7 @@ const ComposerAction: FC = () => {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="aui-composer-dictate text-muted-foreground hover:text-foreground size-7 rounded-full"
+                className="aui-composer-dictate text-muted-foreground hover:text-foreground size-8 rounded-full"
                 aria-label="Start voice input"
               >
                 <MicIcon className="aui-composer-dictate-icon size-4" />
@@ -592,7 +592,7 @@ const ComposerAction: FC = () => {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="aui-composer-stop-dictation text-destructive size-7 rounded-full"
+                className="aui-composer-stop-dictation text-destructive size-8 rounded-full"
                 aria-label="Stop voice input"
               >
                 <SquareIcon className="aui-composer-stop-dictation-icon size-3.5 animate-pulse fill-current" />
@@ -615,7 +615,7 @@ const ComposerAction: FC = () => {
               type="button"
               variant="default"
               size="icon"
-              className="aui-composer-send size-7 rounded-full"
+              className="aui-composer-send size-8 rounded-full"
               aria-label="Send message"
             >
               <ArrowUpIcon className="aui-composer-send-icon size-4" />
@@ -630,7 +630,7 @@ const ComposerAction: FC = () => {
               type="button"
               variant="default"
               size="icon"
-              className="aui-composer-resume size-7 rounded-full"
+              className="aui-composer-resume size-8 rounded-full"
               aria-label="Resume generating"
             >
               <PlayIcon className="aui-composer-resume-icon size-4" />
@@ -649,7 +649,7 @@ const ComposerAction: FC = () => {
               type="button"
               variant="default"
               size="icon"
-              className="aui-composer-cancel size-7 rounded-full"
+              className="aui-composer-cancel size-8 rounded-full"
               aria-label={isSending ? "Cancel sending" : "Stop generating"}
             >
               <SquareIcon className="aui-composer-cancel-icon size-3.5 fill-current" />
