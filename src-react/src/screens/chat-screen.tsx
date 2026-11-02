@@ -4,7 +4,6 @@ import {
   type ThreadMessageLike,
 } from "@assistant-ui/react";
 import { Thread } from "@/components/assistant-ui/elements/thread.aui";
-import { AppMenu } from "@/components/app-menu";
 import { NAV_BOTTOM_SPACE } from "@/components/app-nav";
 import { TOP_BAR_SPACE, TopBar } from "@/components/top-bar";
 import { useChatStore, type ChatMessage, type ChatPart } from "@/store/chat";
@@ -40,7 +39,7 @@ export function ChatScreen() {
           ["--thread-top-inset" as string]: TOP_BAR_SPACE,
           ["--thread-bottom-inset" as string]: NAV_BOTTOM_SPACE,
         }}>
-        <TopBar action={<AppMenu />} />
+        <TopBar />
         <Thread />
       </div>
     </AssistantRuntimeProvider>

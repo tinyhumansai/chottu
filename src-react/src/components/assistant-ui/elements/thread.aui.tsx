@@ -267,7 +267,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean }> = ({
           <ThreadPrimitive.ViewportFooter
             className={cn(
               // Chottu: the thread runs under the floating bottom bar; lift the composer above it.
-              "aui-thread-viewport-footer flex flex-col gap-4 overflow-visible pb-[calc(var(--thread-bottom-inset,0px)+0.5rem)]",
+              "aui-thread-viewport-footer flex flex-col gap-4 overflow-visible pb-[calc(var(--thread-bottom-inset,0px)+0.5rem)] md:pb-5",
               !isEmpty &&
                 "sticky bottom-0 mt-auto rounded-t-(--composer-radius)",
             )}
