@@ -3,13 +3,6 @@
 
 use tauri::Manager;
 
-/// Example command callable from the frontend via `invoke("greet", { name })`.
-#[tauri::command]
-fn greet(name: &str) -> String {
-    log::info!("greet called with {name:?}");
-    format!("Hello, {name}! You've been greeted from Rust!")
-}
-
 fn main() {
     tauri::Builder::default()
         // single-instance must be registered first.
@@ -45,7 +38,6 @@ fn main() {
             }
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![greet])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
