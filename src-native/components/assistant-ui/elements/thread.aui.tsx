@@ -1,4 +1,6 @@
 import {
+import { VoiceNotePart } from "@/voice-notes/message-part";
+import { VOICE_NOTE } from "@/voice-notes/types";
   ComposerAddAttachment,
   ComposerAttachments,
   UserMessageAttachments,
@@ -385,7 +387,8 @@ export const Thread: FC<ThreadProps> = ({
   return (
     <ThreadComponentsContext.Provider value={components}>
       <ThreadViewportContext.Provider value={viewport}>
-        <ThreadPrimitive.Root className="aui-root aui-thread-root flex-1 bg-transparent" // Chottu: the wallpaper shows through>
+        {/* Chottu: transparent, so the chat wallpaper shows through. */}
+        <ThreadPrimitive.Root className="aui-root aui-thread-root flex-1 bg-transparent">
           <KeyboardAvoidingView
             className="flex-1"
             behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -670,11 +673,12 @@ const DefaultComposerInput: FC = () => {
 
   return (
     <ComposerPrimitive.Input
-      placeholder="Send a message..."
+      placeholder="Message Chottu"
       placeholderTextColorClassName={
         hydrated ? "accent-muted-foreground/60" : undefined
       }
-      className="aui-composer-input text-foreground web:resize-none web:outline-none max-h-48 min-h-10 px-2.5 py-1 text-base leading-6"
+      // Chottu: one line tall until you type more.
+      className="aui-composer-input text-foreground web:resize-none web:outline-none max-h-36 min-h-9 flex-1 px-3 py-1.5 text-base leading-6"
       multiline
       accessibilityLabel="Message input"
     />
@@ -688,8 +692,8 @@ const Composer: FC = () => {
 
   return (
     <ComposerPrimitive.Root className="aui-composer-root w-full">
-      <View className="aui-composer-shell border-border/60 dark:border-muted-foreground/15 bg-card gap-2 rounded-3xl border p-2">
-        <ComposerAttachments />
+      {/* Chottu: a single floating row, the same height as the tab bar; no attachments yet. */}
+      <View className="aui-composer-shell border-border/60 bg-glass relative min-h-[46px] flex-row items-end gap-1 rounded-[23px] border p-1 shadow-md">
         <ComposerInput />
         <ComposerAction />
       </View>
@@ -698,6 +702,7 @@ const Composer: FC = () => {
 };
 
 const ComposerAction: FC = () => {
+  const { ComposerExtra } = useContext(ThreadComponentsContext);
   // The stop control only cancels the send while no run it could stop is going.
   const isSending = useAuiState(
     (s) =>
@@ -706,17 +711,23 @@ const ComposerAction: FC = () => {
   );
 
   return (
-    <View className="aui-composer-action-wrapper flex-row items-center justify-between">
-      <ComposerAddAttachment />
+    // Chottu: no `relative` here, so the voice note recording bar covers the whole composer.
+    <View className="aui-composer-action-wrapper flex-row items-center">
       <View className="flex-row items-center gap-1.5">
+        {ComposerExtra && (
+          <AuiIf condition={(s) => s.composer.isEmpty && !s.thread.isRunning}>
+            <ComposerExtra />
+          </AuiIf>
+        )}
         <AuiIf
           condition={(s) =>
             s.composer.submission === undefined &&
-            (!s.thread.isRunning || s.thread.voice !== undefined)
+            (!s.thread.isRunning || s.thread.voice !== undefined) &&
+            !(ComposerExtra && s.composer.isEmpty)
           }
         >
           <ComposerPrimitive.Send
-            className="aui-composer-send bg-primary active:bg-primary/90 size-7 items-center justify-center rounded-full disabled:opacity-50"
+            className="aui-composer-send bg-primary active:bg-primary/90 size-9 items-center justify-center rounded-full disabled:opacity-50"
             hitSlop={iconButtonHitSlop}
             accessibilityLabel="Send message"
           >
@@ -733,7 +744,7 @@ const ComposerAction: FC = () => {
           }
         >
           <ComposerPrimitive.Cancel
-            className="aui-composer-cancel bg-primary active:bg-primary/90 size-7 items-center justify-center rounded-full"
+            className="aui-composer-cancel bg-primary active:bg-primary/90 size-9 items-center justify-center rounded-full"
             hitSlop={iconButtonHitSlop}
             accessibilityLabel={
               isSending ? "Cancel sending" : "Stop generating"
@@ -758,7 +769,7 @@ const MessageError: FC = () => (
 
 const UserText: TextMessagePartComponent = ({ text }) => (
   <Text
-    className="aui-user-message-text text-foreground text-base leading-6"
+    className="aui-user-message-text text-bubble-user-foreground text-base leading-6"
     selectable
   >
     {text}
@@ -817,7 +828,8 @@ const AssistantMessage: FC = () => {
 
   return (
     <MessagePrimitive.Root className="aui-assistant-message-root">
-      <View className="aui-assistant-message-content px-2">
+      {/* Chottu: replies sit in a bubble too. */}
+      <View className="aui-assistant-message-content bg-bubble-assistant max-w-[85%] self-start rounded-[20px] px-4 py-2 shadow-sm">
         <MessagePrimitive.GroupedParts groupBy={groupBy}>
           {({ part, children }) => {
             switch (part.type) {
@@ -906,8 +918,16 @@ const UserMessage: FC = () => (
   <MessagePrimitive.Root className="aui-user-message-root items-end gap-y-2 px-2">
     <UserMessageAttachments />
     <AuiIf condition={(s) => s.message.parts.length > 0}>
-      <View className="aui-user-message-content bg-muted max-w-[85%] rounded-xl px-4 py-2">
-        <MessagePrimitive.Parts components={{ Text: UserText, Image, File }} />
+      {/* Chottu: user bubble colours, and voice notes render in user messages too. */}
+      <View className="aui-user-message-content bg-bubble-user max-w-[85%] rounded-[20px] px-4 py-2 shadow-sm">
+        <MessagePrimitive.Parts
+          components={{
+            Text: UserText,
+            Image,
+            File,
+            data: { by_name: { [VOICE_NOTE]: VoiceNotePart } },
+          }}
+        />
       </View>
     </AuiIf>
     <View className="aui-user-message-footer -me-1 flex-row items-center justify-end">
