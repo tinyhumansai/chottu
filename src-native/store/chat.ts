@@ -1,6 +1,7 @@
-import type { ThreadMessageLike } from "@assistant-ui/react";
+import type { ThreadMessageLike } from "@assistant-ui/react-native";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { appStorage } from "@/lib/storage";
 import { backend, type ChatTurn } from "@/backend";
 import { newId } from "@/lib/id";
 
@@ -149,6 +150,7 @@ export const useChatStore = create<ChatState>()(
     },
     {
       name: "chottu-chat",
+      storage: appStorage,
       version: 1,
       partialize: (s) => ({ messages: s.messages }),
       // v0 stored `text: string`; v1 stores `content: ChatPart[]`.

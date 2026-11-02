@@ -4,7 +4,10 @@ import type { ChatPart } from "@/store/chat";
 export const VOICE_NOTE = "voice-note";
 
 export type VoiceNote = {
-  /** Playable audio as a data: URL, so it survives reloads in the persisted chat. */
+  /**
+   * Playable audio: a `data:` URL (demo notes, web recordings) or a `file://`
+   * URI in the app's documents folder (native recordings). Both survive restarts.
+   */
   src: string;
   durationMs: number;
   /** Loudness per bar, 0..1, for drawing the waveform. */
