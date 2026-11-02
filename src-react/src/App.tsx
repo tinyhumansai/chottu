@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { MessageCircle, Settings } from "lucide-react";
-import { BottomBar, type Tab } from "@/components/bottom-bar";
+import { BOTTOM_BAR_SPACE, BottomBar, type Tab } from "@/components/bottom-bar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDeepLinkMessages } from "@/hooks/use-deep-link-messages";
 import { ChatScreen } from "@/screens/chat-screen";
@@ -31,7 +31,7 @@ export default function App() {
   return (
     <TooltipProvider>
       <div className="bg-background text-foreground flex h-dvh flex-col">
-        <main className="flex min-h-0 flex-1 flex-col">
+        <main className="flex min-h-0 flex-1 flex-col" style={{ paddingBottom: BOTTOM_BAR_SPACE }}>
           {tab === "chat" ? <ChatScreen /> : <SettingsScreen />}
         </main>
         <BottomBar tabs={TABS} active={tab} onChange={setTab} />

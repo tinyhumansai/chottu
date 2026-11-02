@@ -7,6 +7,7 @@
     "dev": "pnpm --filter chottu-react dev",
     "build": "pnpm --filter chottu-react build",
     "preview": "pnpm --filter chottu-react preview",
+    "test": "pnpm --filter chottu-react test",
     "tauri": "tauri",
     "desktop": "cross-env TAURI_APP_PATH=src-tauri-desktop TAURI_FRONTEND_PATH=. tauri",
     "mobile": "cross-env TAURI_APP_PATH=src-tauri-mobile TAURI_FRONTEND_PATH=. tauri",

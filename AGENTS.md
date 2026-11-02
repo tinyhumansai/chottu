@@ -25,15 +25,19 @@ package.json               # root pnpm package: Tauri CLI + the desktop/mobile
 pnpm-workspace.yaml        # workspace members: src-react
 src-react/                 # the frontend, pnpm package `chottu-react`
 ├── src/
-│   ├── App.tsx            # wires the chat store into assistant-ui
-│   ├── store/chat.ts      # zustand store: messages, send, regenerate,
-│   │                      # cancel, clear; persisted to localStorage
+│   ├── App.tsx            # app shell: screens + floating bottom bar
+│   ├── screens/           # one file per bottom-bar tab (chat, settings)
+│   ├── store/chat.ts      # zustand store: messages of any part type,
+│   │                      # register, send, regenerate, cancel, clear;
+│   │                      # persisted to localStorage (versioned)
 │   ├── backend/           # the reply source behind `ChatBackend`
 │   │                      # (mock today; swap for a real model client)
 │   ├── components/ui/     # shadcn components (vendored by the shadcn CLI)
 │   ├── components/assistant-ui/ # assistant-ui registry components (vendored)
-│   ├── hooks/             # hooks pulled in by the registry components
+│   ├── components/        # our own components (bottom-bar, screen-header)
+│   ├── hooks/             # app hooks + hooks pulled in by registry components
 │   ├── lib/utils.ts       # `cn()` helper
+│   ├── lib/id.ts          # `newId()`; use it, never `crypto.randomUUID`
 │   └── index.css          # Tailwind v4 entry + shadcn theme tokens
 ├── components.json        # shadcn CLI config (radix base, Nova preset)
 └── vite.config.ts         # Vite + Tailwind; `@/` alias to src/
@@ -68,6 +72,19 @@ src-tauri-mobile/          # crate `chottu-mobile`, lib `chottu_mobile_lib`
 
 - State lives in zustand stores under `src/store/`. Components read from
   stores and call their actions; they do not hold conversation state.
+- Anything that adds a message to the chat (backend, deep link, notification,
+  a future feature) goes through `useChatStore.getState().register(...)`.
+  Messages hold assistant-ui parts, so text, images, files, reasoning,
+  tool calls and `data-*` parts all fit. Image URLs must be `https:`,
+  `blob:` or `data:image/…`; assistant-ui drops anything else.
+- If you change the persisted message shape, bump the store's persist
+  `version` and add a `migrate` step so existing chats keep loading.
+- The app is also served over plain http (LAN, phone testing), which is not a
+  secure context. Do not use secure-context-only APIs such as
+  `crypto.randomUUID` or `navigator.clipboard` without a fallback.
+- New tabs are a screen in `src/screens/` plus an entry in `TABS` in
+  `App.tsx`. The bottom bar floats; screens get bottom padding from
+  `BOTTOM_BAR_SPACE` so nothing sits under it.
 - The UI never calls a model or network API directly. Replies come through
   the `ChatBackend` interface in `src/backend/`, so the store and UI do not
   change when the backend does.
@@ -90,6 +107,7 @@ pnpm install
 
 pnpm dev                 # frontend only, in a browser at http://localhost:1420
 pnpm build               # type-check + production build into src-react/dist
+pnpm test                # Vitest suite (src-react)
 
 pnpm desktop:dev         # desktop app with hot reload
 pnpm desktop:build       # release bundles for the host platform
@@ -109,7 +127,7 @@ the right crate by setting `TAURI_APP_PATH`, for example
 `TAURI_APP_PATH` yourself; with two Tauri crates in the tree it can pick the
 wrong one.
 
-Before reporting work done, run at least `pnpm build` and
+Before reporting work done, run at least `pnpm build`, `pnpm test` and
 `cargo clippy --workspace --all-targets` and read their output. For UI
 changes, also launch the app (`pnpm dev` or `pnpm desktop:dev`) and check the
 change on screen.
@@ -148,13 +166,12 @@ Dependencies:
 
 ## Testing
 
-There is no test suite yet. When you add the first tests, follow these
-conventions:
-
-- Frontend tests use Vitest, colocated as `*.test.ts` / `*.test.tsx` next to
+- Frontend tests use Vitest (`pnpm test`), colocated as `*.test.ts` / `*.test.tsx` next to
   the code they cover. Test the store and the backend behind their interfaces,
-  not component internals.
-- Rust tests go in `<module>_tests.rs` beside the module, not in an inline
+  not component internals. `src/store/chat.test.ts` shows the pattern:
+  stub globals with `vi.stubGlobal`, `vi.resetModules()`, then import the
+  store fresh.
+- There are no Rust tests yet. When you add them, they go in `<module>_tests.rs` beside the module, not in an inline
   `#[cfg(test)] mod tests` block.
 - Tests never call real model APIs or other third-party services; use the
   mock backend or a fake `ChatBackend`.

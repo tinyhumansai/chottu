@@ -9,30 +9,38 @@ type BottomBarProps<T extends string> = {
   onChange: (id: T) => void;
 };
 
+/** Height the floating bar takes up, including its gap from the screen edge. */
+export const BOTTOM_BAR_SPACE = "calc(5rem + env(safe-area-inset-bottom))";
+
+/** A floating pill of tabs pinned to the bottom of the screen. */
 export function BottomBar<T extends string>({ tabs, active, onChange }: BottomBarProps<T>) {
   return (
     <nav
       aria-label="Main"
-      className="bg-background flex shrink-0 border-t pb-[env(safe-area-inset-bottom)]"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center px-4 pb-[calc(1rem+env(safe-area-inset-bottom))]"
     >
-      {tabs.map(({ id, label, icon: Icon }) => {
-        const selected = id === active;
-        return (
-          <button
-            key={id}
-            type="button"
-            aria-current={selected ? "page" : undefined}
-            onClick={() => onChange(id)}
-            className={cn(
-              "flex flex-1 flex-col items-center gap-0.5 py-2 text-xs transition-colors",
-              selected ? "text-foreground" : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            <Icon className="size-5" strokeWidth={selected ? 2.25 : 1.75} />
-            {label}
-          </button>
-        );
-      })}
+      <div className="bg-background/80 pointer-events-auto flex gap-1 rounded-full border p-1 shadow-lg backdrop-blur-md">
+        {tabs.map(({ id, label, icon: Icon }) => {
+          const selected = id === active;
+          return (
+            <button
+              key={id}
+              type="button"
+              aria-current={selected ? "page" : undefined}
+              onClick={() => onChange(id)}
+              className={cn(
+                "flex h-11 items-center gap-2 rounded-full px-4 text-sm font-medium transition-colors",
+                selected
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+              )}
+            >
+              <Icon className="size-4.5" />
+              {label}
+            </button>
+          );
+        })}
+      </div>
     </nav>
   );
 }

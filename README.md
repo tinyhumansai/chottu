@@ -38,7 +38,12 @@ Linux needs the WebKitGTK 4.1 system deps; see <https://tauri.app/start/prerequi
 and [assistant-ui](https://www.assistant-ui.com):
 
 - `src/store/chat.ts`: a [zustand](https://zustand.docs.pmnd.rs) store that owns the conversation
-  (send, regenerate, cancel, new chat) and persists it to `localStorage`
+  (send, regenerate, cancel, new chat) and persists it to `localStorage`. Anything can add a
+  message of any kind (text, image, file, tool call, …) with
+  `useChatStore.getState().register({ role, content })`; `chottu://` deep links already do. In
+  `pnpm dev` the store is also on `window.chottuChat` for trying this from the console
+- `src/screens/` + `src/components/bottom-bar.tsx`: the Chat and Settings tabs and the floating
+  bottom bar that switches between them
 - `src/backend/`: the reply source. It is a mock that echoes and streams word by word; replace
   `backend` with a real model client
 - `src/App.tsx`: connects the store to assistant-ui through `useExternalStoreRuntime`
