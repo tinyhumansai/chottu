@@ -30,11 +30,13 @@ src-react/                 # the frontend, pnpm package `chottu-react`
 │   ├── store/chat.ts      # zustand store: messages of any part type,
 │   │                      # register, send, regenerate, cancel, clear;
 │   │                      # persisted to localStorage (versioned)
+│   ├── store/theme.ts     # zustand store: system/light/dark preference
 │   ├── backend/           # the reply source behind `ChatBackend`
 │   │                      # (mock today; swap for a real model client)
 │   ├── components/ui/     # shadcn components (vendored by the shadcn CLI)
 │   ├── components/assistant-ui/ # assistant-ui registry components (vendored)
-│   ├── components/        # our own components (bottom-bar, top-bar, chottu-avatar)
+│   ├── components/        # our own components (bottom-bar, top-bar, app-menu,
+│   │                      # chottu-avatar)
 │   ├── hooks/             # app hooks + hooks pulled in by registry components
 │   ├── lib/utils.ts       # `cn()` helper
 │   ├── lib/id.ts          # `newId()`; use it, never `crypto.randomUUID`
@@ -96,7 +98,12 @@ src-tauri-mobile/          # crate `chottu-mobile`, lib `chottu_mobile_lib`
   one-line comment saying why, so a later registry update can be merged.
 - Import through the `@/` alias, not long relative paths.
 - Style with Tailwind classes and the theme tokens in `index.css`. Do not add
-  hard-coded colours; light and dark both come from the tokens.
+  hard-coded colours; light and dark both come from the tokens (add a token,
+  with a value in both themes, as was done for `bubble-user`).
+- Dark mode is the `dark` class on `<html>`, set by `useApplyTheme` from the
+  theme store. Do not read `prefers-color-scheme` anywhere else.
+- There is no header bar. The chat screen has a floating `TopBar` (Chottu's
+  avatar and name, the `AppMenu` hamburger); app-level actions go in that menu.
 
 ## Build And Test
 
