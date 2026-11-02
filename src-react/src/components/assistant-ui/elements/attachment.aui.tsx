@@ -238,7 +238,10 @@ export const ComposerAttachments: FC = () => {
   );
 };
 
+// Hidden until the runtime has an attachment adapter, so the button never does nothing.
 export const ComposerAddAttachment: FC = () => {
+  const enabled = useAuiState((s) => s.thread.capabilities.attachments);
+  if (!enabled) return null;
   return (
     <ComposerPrimitive.AddAttachment asChild>
       <TooltipIconButton
