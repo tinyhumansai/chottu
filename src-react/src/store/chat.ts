@@ -27,7 +27,10 @@ export type NewMessage = {
 type ChatState = {
   messages: ChatMessage[];
   isRunning: boolean;
-  /** Add any message from anywhere (backend, deep link, notification, …). Returns its id. */
+  /**
+   * Add any message from anywhere (backend, deep link, notification, …). Returns its id.
+   * Image parts must be `https:`, `blob:` or `data:image/…` URLs; assistant-ui drops others.
+   */
   register: (message: NewMessage) => string;
   /** Add a user message and stream the backend's reply. */
   send: (content: string | ChatPart[]) => Promise<void>;
