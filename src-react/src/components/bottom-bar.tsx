@@ -11,16 +11,16 @@ type BottomBarProps<T extends string> = {
 
 /**
  * Height the floating bar takes up, including its gap from the screen edge:
- * 3rem tabs + 0.75rem padding + 2px border + 0.5rem bottom gap. Keep in sync with the classes below.
+ * 3rem tabs + 0.75rem padding + 2px border + 1.5rem bottom gap. Keep in sync with the classes below.
  */
-export const BOTTOM_BAR_SPACE = "calc(4.25rem + 2px + env(safe-area-inset-bottom))";
+export const BOTTOM_BAR_SPACE = "calc(5.25rem + 2px + env(safe-area-inset-bottom))";
 
 /** A floating pill of icon tabs pinned to the bottom of the screen. Labels are for a11y and tooltips. */
 export function BottomBar<T extends string>({ tabs, active, onChange }: BottomBarProps<T>) {
   return (
     <nav
       aria-label="Main"
-      className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center px-4 pb-[calc(0.5rem+env(safe-area-inset-bottom))]"
+      className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))]"
     >
       <div className="bg-background/80 pointer-events-auto flex gap-1 rounded-full border p-1.5 shadow-lg backdrop-blur-md">
         {tabs.map(({ id, label, icon: Icon }) => {
