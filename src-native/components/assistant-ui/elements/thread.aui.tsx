@@ -252,6 +252,28 @@ export const Thread: FC<ThreadProps> = ({
   >(undefined);
   const { Rail } = components;
 
+  // Chottu: react-native-web has no `maintainVisibleContentPosition`, so on
+  // web the list would stop following a streaming reply. Keep it pinned to
+  // the end while the reader is at (or near) the bottom.
+  const pinnedRef = useRef(true);
+  const followOnWeb =
+    Platform.OS === "web" && !Rail
+      ? {
+          onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+            const { contentOffset, contentSize, layoutMeasurement } =
+              event.nativeEvent;
+            pinnedRef.current =
+              contentSize.height - layoutMeasurement.height - contentOffset.y <
+              48;
+          },
+          onContentSizeChange: () => {
+            if (pinnedRef.current)
+              listRef.current?.scrollToEnd({ animated: false });
+          },
+          scrollEventThrottle: 32,
+        }
+      : {};
+
   useEffect(() => () => clearTimeout(jumpRef.current?.timer), []);
 
   const jumpTo = useCallback(
@@ -430,6 +452,7 @@ export const Thread: FC<ThreadProps> = ({
                   showsVerticalScrollIndicator={false}
                   keyboardDismissMode="interactive"
                   keyboardShouldPersistTaps="handled"
+                  {...followOnWeb}
                   {...(Rail
                     ? {
                         onContentSizeChange: onListContentSizeChange,

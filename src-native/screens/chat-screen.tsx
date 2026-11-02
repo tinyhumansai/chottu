@@ -55,13 +55,16 @@ export function ChatScreen() {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <ChatWallpaper>
-        <VoiceNoteRecorderProvider>
-          <Thread
-            components={THREAD_COMPONENTS}
-            insets={{ top: safe.top + TOP_BAR_SPACE, bottom: nav.wide ? Math.max(safe.bottom, 12) : nav.bottom }}
-          />
-        </VoiceNoteRecorderProvider>
-        <TopBar onCall={startCall} />
+        {/* The wallpaper runs under the sidebar; the conversation sits beside it. */}
+        <View className="flex-1" style={{ paddingLeft: nav.left }}>
+          <VoiceNoteRecorderProvider>
+            <Thread
+              components={THREAD_COMPONENTS}
+              insets={{ top: safe.top + TOP_BAR_SPACE, bottom: nav.wide ? Math.max(safe.bottom, 12) : nav.bottom }}
+            />
+          </VoiceNoteRecorderProvider>
+          <TopBar onCall={startCall} />
+        </View>
         <VoiceNoteDataUI />
       </ChatWallpaper>
     </AssistantRuntimeProvider>

@@ -15,7 +15,7 @@ export function Page({ title, subtitle, children }: { title: string; subtitle?: 
   return (
     <ScrollView
       className="bg-background flex-1"
-      contentContainerStyle={{ paddingTop: insets.top + 24, paddingBottom: nav.bottom + 24, paddingHorizontal: 16 }}
+      contentContainerStyle={{ paddingTop: insets.top + 24, paddingBottom: nav.bottom + 24, paddingLeft: nav.left + 16, paddingRight: 16 }}
     >
       <View className="mx-auto w-full max-w-[44rem] gap-6">
         <View className="gap-1">
