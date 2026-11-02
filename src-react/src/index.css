@@ -172,11 +172,11 @@
 
 /*
  * Space reserved for the floating nav (see components/app-nav.tsx).
- * Phones: bottom bar = 3rem tabs + 0.75rem padding + 2px border + 1rem gap.
+ * Phones: bottom bar = 2.25rem tabs + 0.5rem padding + 2px border (46px, the composer's height) + 1rem gap.
  * Desktop (md+): left sidebar = 1rem gap + 3rem tabs + 0.75rem padding + 2px border + 0.75rem.
  */
 :root {
-  --nav-bottom-space: calc(4.75rem + 2px + env(safe-area-inset-bottom));
+  --nav-bottom-space: calc(3.75rem + 2px + env(safe-area-inset-bottom));
   --nav-left-space: 0px;
 }
 @media (width >= 48rem) {

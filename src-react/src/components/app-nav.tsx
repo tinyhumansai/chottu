@@ -29,8 +29,9 @@ export function AppNav<T extends string>(props: AppNavProps<T>) {
         aria-label="Main"
         className="pointer-events-none fixed inset-x-0 bottom-0 z-20 flex justify-center px-4 pb-[calc(1rem+env(safe-area-inset-bottom))] md:hidden"
       >
-        <div className={pill}>
-          <NavButtons {...props} className="h-12 w-16" />
+        {/* Same width and height (46px) as the composer above it. */}
+        <div className={cn(pill, "w-full max-w-[44rem] p-1")}>
+          <NavButtons {...props} className="h-9 flex-1" />
         </div>
       </nav>
       <nav
@@ -70,7 +71,7 @@ function NavButtons<T extends string>({
             : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
         )}
       >
-        <Icon className="size-6" strokeWidth={1.75} />
+        <Icon className={tooltipSide ? "size-6" : "size-5"} strokeWidth={1.75} />
       </button>
     );
     if (!tooltipSide) return button;
