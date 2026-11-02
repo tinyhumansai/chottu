@@ -4,7 +4,14 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // stubbed localStorage below instead.
 vi.mock("@/lib/storage", async () => {
   const { createJSONStorage } = await import("zustand/middleware");
-  return { appStorage: createJSONStorage(() => localStorage) };
+  // Look localStorage up on every call: each test stubs a fresh one.
+  return {
+    appStorage: createJSONStorage(() => ({
+      getItem: (k: string) => localStorage.getItem(k),
+      setItem: (k: string, v: string) => localStorage.setItem(k, v),
+      removeItem: (k: string) => localStorage.removeItem(k),
+    })),
+  };
 });
 
 // Pages served over plain http on a LAN or public IP are not a secure context,
