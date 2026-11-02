@@ -1,69 +1,66 @@
 # chottu
 
-Chottu desktop and mobile apps, built with [Tauri 2](https://tauri.app) + React 19 + TypeScript + Vite.
+The Chottu client apps: one React Native codebase for iOS, Android, web, and (through a Tauri 2
+shell) macOS, Windows and Linux.
 
-## Layout
+| Path                 | What                                                                         |
+| -------------------- | ---------------------------------------------------------------------------- |
+| `src-native/`        | The app: Expo (React Native), pnpm package `chottu-native`                   |
+| `src-tauri-desktop/` | Tauri 2 desktop shell that loads the Expo web build (`chottu-desktop` crate) |
+| `Cargo.toml`         | Cargo workspace for the desktop crate                                        |
 
-| Path                 | What                                                                  |
-| -------------------- | --------------------------------------------------------------------- |
-| `src-react/`         | Shared frontend: chat UI, its own pnpm workspace package (`chottu-react`) |
-| `src-tauri-desktop/` | Tauri app for macOS, Windows, Linux (`chottu-desktop` crate)          |
-| `src-tauri-mobile/`  | Tauri app for Android and iOS (`chottu-mobile` crate)                 |
-| `Cargo.toml`         | Cargo workspace for both crates; shared dependency versions live here |
+Stack:
 
-Both Tauri apps load the same `src-react` frontend. The `desktop` and `mobile` scripts point the
-Tauri CLI at the right crate through `TAURI_APP_PATH`.
+- **Expo SDK 58** (React Native 0.88, Expo Router)
+- **[assistant-ui native](https://www.assistant-ui.com/native)** for the chat thread, composer and messages
+- **[gluestack-ui v5](https://gluestack.io)** for UI primitives (buttons, switches, dialogs, toasts)
+- **[Uniwind](https://uniwind.dev)** (Tailwind v4) styling, shared by assistant-ui and gluestack
+- **[zustand](https://zustand.docs.pmnd.rs)** stores
+- **expo-audio** for voice notes
 
 ## Develop
 
 ```bash
 pnpm install
-pnpm desktop:dev       # desktop app with hot reload
-pnpm desktop:build     # release bundles (deb/rpm/AppImage, dmg, msi…)
 
-pnpm android:init      # once; needs Android SDK + NDK and Java
-pnpm android:dev
-pnpm ios:init          # once; macOS + Xcode only
-pnpm ios:dev
+pnpm dev               # web, at http://localhost:1420 (and on your LAN)
+pnpm start             # Expo dev server: scan the QR code with Expo Go or a dev build
+pnpm ios               # native iOS build (macOS + Xcode)
+pnpm android           # native Android build (Android SDK)
+
+pnpm desktop:dev       # desktop app around the web dev server
+pnpm desktop:build     # desktop bundles (deb/rpm/AppImage, dmg, msi…)
+
+pnpm test              # Vitest: stores, backend, helpers
+pnpm typecheck
+pnpm build             # web export into src-native/dist (the desktop app ships this)
 ```
 
-`pnpm desktop <cmd>` and `pnpm mobile <cmd>` pass any other Tauri CLI command through, for example
-`pnpm desktop add <plugin>` or `pnpm mobile icon`.
+`pnpm desktop <cmd>` passes any other Tauri CLI command through, for example
+`pnpm desktop add <plugin>`. Linux desktop builds need the WebKitGTK 4.1 system deps; see
+<https://tauri.app/start/prerequisites/>.
 
-Linux needs the WebKitGTK 4.1 system deps; see <https://tauri.app/start/prerequisites/>.
+## The app
 
-## Chat app
+- **Chat:** assistant-ui's native thread over the chat store (`useExternalStoreRuntime`), on a
+  WhatsApp-style wallpaper, with a floating top bar (Chottu, plus a call button) and a one-line
+  composer. With nothing typed, the composer's action is the mic: voice notes record, play with a
+  seekable waveform, and persist.
+- **Wallet:** balance and transactions (sample data).
+- **Ideas:** suggestions, schedules (crons) and notifications (sample data).
+- **Mini-apps:** shortcuts that ask Chottu.
+- **Settings:** system, light or dark theme, and clearing the chat history.
+- **Call:** a full-screen call with Chottu. The connection is mocked; the state machine is real.
 
-`src-react` is a small chat client built with [shadcn/ui](https://ui.shadcn.com) (Tailwind v4)
-and [assistant-ui](https://www.assistant-ui.com):
+Navigation is a floating bottom tab bar on phones and a floating left sidebar from 768px up.
 
-- `src/store/chat.ts`: a [zustand](https://zustand.docs.pmnd.rs) store that owns the conversation
-  (send, regenerate, cancel, new chat) and persists it to `localStorage`. Anything can add a
-  message of any kind (text, image, file, tool call, …) with
-  `useChatStore.getState().register({ role, content })`; `chottu://` deep links already do. In
-  `pnpm dev` the store is also on `window.chottuChat` for trying this from the console
-- `src/screens/` + `src/components/app-nav.tsx`: the Chat and Settings tabs, switched by a
-  floating bottom tab bar on phones and a floating left sidebar on desktop
-- `src/backend/`: the reply source. It is a mock that echoes and streams word by word; replace
-  `backend` with a real model client
-- `src/App.tsx`: connects the store to assistant-ui through `useExternalStoreRuntime`
-- `src/components/`: shadcn and assistant-ui components, vendored by their CLIs. Add more with
-  `pnpm dlx shadcn@latest add <component>` from `src-react/`
-
-`pnpm dev` serves the frontend alone in a browser, which is the quickest way to work on the UI.
+Replies come from `src-native/backend/`, a mock that echoes word by word. Plug a real model in
+there; nothing else changes.
 
 ## What's wired in
 
-Both apps:
-
-- Plugins: log, store, notification, dialog, fs, os, clipboard-manager, opener, process, deep-link
-- `chottu://` deep links, received in the frontend through `onOpenUrl`
-- A strict CSP in each `tauri.conf.json`
-
-Desktop only:
-
-- Tray icon with Show and Quit (`src-tauri-desktop/src/main.rs`)
-- Plugins: single-instance (a second launch focuses the open window), window-state,
-  global-shortcut, autostart
-
-Not yet enabled: the updater plugin (needs a signing key and update endpoint).
+- `chottu://` deep links: Expo Linking on mobile, the Tauri deep-link plugin on desktop. Each link
+  lands in the chat as a system message.
+- Microphone permission on iOS and Android (`app.json`), and a strict CSP on desktop.
+- The desktop shell: tray icon, single-instance, window-state, global-shortcut, autostart, plus the
+  log, store, notification, dialog, fs, os, clipboard, opener, process and deep-link plugins.

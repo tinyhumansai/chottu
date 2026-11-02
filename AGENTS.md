@@ -6,9 +6,9 @@ the same instructions.
 
 ## What This Repository Is
 
-The Chottu client apps: one React chat frontend shipped through two Tauri 2
-shells, one for desktop (macOS, Windows, Linux) and one for mobile (Android,
-iOS). The chat bot itself lives in `chottu-core`; this repository is the
+The Chottu client apps: one React Native (Expo) app for iOS, Android and web,
+and a Tauri 2 shell that ships that app's web build to macOS, Windows and
+Linux. The chat bot itself lives in `chottu-core`; this repository is the
 client only.
 
 The repository is a submodule of the `workflow-chottu` umbrella. Cross-repo
@@ -17,122 +17,93 @@ plans belong at the umbrella root, not here.
 ## Project Structure
 
 ```text
-Cargo.toml                 # virtual Cargo workspace: both Tauri crates, shared
-                           # [workspace.package] and [workspace.dependencies],
-                           # release profile
-package.json               # root pnpm package: Tauri CLI + the desktop/mobile
-                           # scripts; no frontend code
-pnpm-workspace.yaml        # workspace members: src-react
-src-react/                 # the frontend, pnpm package `chottu-react`
-├── src/
-│   ├── App.tsx            # app shell: screens + floating bottom bar
-│   ├── screens/           # one file per nav tab: chat, wallet, ideas,
-│   │                      # apps (mini-apps), settings
-│   ├── store/chat.ts      # zustand store: messages of any part type,
-│   │                      # register, send, regenerate, cancel, clear;
-│   │                      # persisted to localStorage (versioned)
-│   ├── store/theme.ts     # zustand store: system/light/dark preference
-│   ├── store/ui.ts        # active tab (any screen can switch tabs)
-│   ├── store/wallet.ts    # balance + transactions (sample data for now)
-│   ├── store/ideas.ts     # suggestions, schedules (crons), notifications
-│   ├── store/call.ts      # voice call with Chottu (connection mocked)
-│   ├── voice-notes/       # voice notes: recorder hook, player, composer mic
-│   │                      # button, `data-voice-note` message part, demo synth
-│   ├── mini-apps/registry.ts # the mini-apps list
-│   ├── lib/ask-chottu.ts  # `askChottu(prompt)`: jump to chat and send
-│   ├── backend/           # the reply source behind `ChatBackend`
-│   │                      # (mock today; swap for a real model client)
-│   ├── components/ui/     # shadcn components (vendored by the shadcn CLI)
-│   ├── components/assistant-ui/ # assistant-ui registry components (vendored)
-│   ├── components/        # our own components (app-nav, top-bar, page,
-│   │                      # call-screen, chottu-avatar)
-│   ├── hooks/             # app hooks + hooks pulled in by registry components
-│   ├── lib/utils.ts       # `cn()` helper
-│   ├── lib/id.ts          # `newId()`; use it, never `crypto.randomUUID`
-│   └── index.css          # Tailwind v4 entry + shadcn theme tokens
-├── components.json        # shadcn CLI config (radix base, Nova preset)
-└── vite.config.ts         # Vite + Tailwind; `@/` alias to src/
+package.json               # root pnpm package: workspace scripts + Tauri CLI
+pnpm-workspace.yaml        # workspace members: src-native
+.npmrc                     # node-linker=hoisted (Expo and Metro need it)
+Cargo.toml                 # Cargo workspace: the desktop crate, shared deps
+src-native/                # the app, pnpm package `chottu-native` (Expo)
+├── app/                   # Expo Router: _layout.tsx (providers), index.tsx
+│                          # (app shell: screens + floating nav + call)
+├── screens/               # one file per nav tab
+├── store/                 # zustand stores (chat, theme, ui, wallet, ideas,
+│                          # call); chat and theme persist via lib/storage.ts
+├── backend/               # the reply source behind `ChatBackend` (mock today)
+├── voice-notes/           # record (expo-audio), play, waveform, data part
+├── mini-apps/registry.ts  # the mini-apps list
+├── hooks/                 # app hooks; `.web.ts` files are the web variants
+├── lib/                   # id, time, storage, ask-chottu, `cn()`
+├── components/            # our components: app-nav, top-bar, page,
+│                          # chat-wallpaper, chottu-avatar, call-screen, layout
+├── components/ui/         # gluestack-ui components (vendored by its CLI),
+│                          # plus icon.tsx from the assistant-ui registry
+├── components/assistant-ui/ # assistant-ui native elements (vendored)
+├── global.css             # Tailwind v4 + Uniwind entry and every colour token
+├── app.json               # Expo config: ids, permissions, plugins
+└── metro.config.js        # Metro wrapped in Uniwind
 src-tauri-desktop/         # crate `chottu-desktop`, binary `chottu`
 ├── src/main.rs            # plugins, tray icon, single-instance, deep links
 ├── capabilities/          # desktop permissions
-└── tauri.conf.json
-src-tauri-mobile/          # crate `chottu-mobile`, lib `chottu_mobile_lib`
-├── src/lib.rs             # mobile entry point and plugins
-├── src/main.rs            # host-only binary for quick desktop checks
-├── capabilities/          # mobile permissions
-└── tauri.conf.json
+└── tauri.conf.json        # loads src-native/dist; dev loads localhost:1420
 ```
 
-### Two shells, one frontend
+### One app, every platform
 
-- Both shells load the same `src-react` build. Anything a user sees belongs in
-  `src-react`, never in a shell.
-- Desktop-only behavior (tray, single-instance, window-state, global
-  shortcuts, autostart) lives only in `src-tauri-desktop`. Do not add
-  `cfg(desktop)` branches to the mobile crate, or `cfg(mobile)` branches to the
-  desktop crate; put the code in the crate that owns the platform.
-- A plugin used by both shells is declared once in the root
-  `[workspace.dependencies]` and taken with `{ workspace = true }` in each
-  crate. Register it in both `src/` entry points and grant it in both
-  `capabilities/` folders.
-- The frontend must work in both shells and in a plain browser (`pnpm dev`).
-  Guard calls into desktop-only plugins, and catch `invoke` failures rather
-  than assuming a Tauri host.
+- Everything a user sees lives in `src-native`. iOS and Android run it
+  natively; web and desktop run its web export (react-native-web).
+- The desktop shell stays thin: tray, single-instance, window-state, global
+  shortcuts, autostart and deep links. Do not put UI in it.
+- Code must run on native and on web. When a platform needs different code,
+  use a platform file (`thing.web.ts` next to `thing.ts`) or `Platform.OS`,
+  not runtime feature sniffing.
+- Desktop-only APIs (`@tauri-apps/*`) are imported only from `.web.ts` files,
+  behind `isTauri()`, and `invoke` failures are caught: the same web build also
+  runs in a plain browser.
 
 ### Frontend rules
 
-- State lives in zustand stores under `src/store/`. Components read from
-  stores and call their actions; they do not hold conversation state.
+- State lives in zustand stores under `store/`. Components read from stores
+  and call their actions; they do not hold conversation state. Persisted
+  stores use `appStorage` from `lib/storage.ts` (AsyncStorage on native,
+  localStorage on web).
 - Anything that adds a message to the chat (backend, deep link, notification,
   a future feature) goes through `useChatStore.getState().register(...)`.
-  Messages hold assistant-ui parts, so text, images, files, reasoning,
-  tool calls and `data-*` parts all fit. Image URLs must be `https:`,
-  `blob:` or `data:image/…`; assistant-ui drops anything else.
-- A new `send` stops a reply that is still streaming (it is kept, marked
-  cancelled) rather than being dropped, so `askChottu()` from any tab always
-  lands. Do not reintroduce an "ignore while running" guard.
-- Voice notes are `data-voice-note` parts (`voice-notes/types.ts`) holding a
-  data: URL, duration and waveform, rendered for both roles. assistant-ui's
-  own `audio` part is user-only and mp3/wav-only, so do not switch to it.
-  Recording needs a secure context; the mic button disables itself over
-  plain http.
-- Sample data (wallet, ideas, mini-apps, the dev-only "Load sample chat")
-  lives in the stores and registry and is marked as such; replace it with
-  backend data rather than adding more.
-- Non-chat tabs use `Page` / `Section` / `Card` from `components/page.tsx`.
+  Messages hold assistant-ui parts, so text, images, files, reasoning, tool
+  calls and `data-*` parts all fit. Voice notes are `data-voice-note` parts
+  (`voice-notes/types.ts`).
 - If you change the persisted message shape, bump the store's persist
   `version` and add a `migrate` step so existing chats keep loading.
-- The app is also served over plain http (LAN, phone testing), which is not a
-  secure context. Do not use secure-context-only APIs such as
-  `crypto.randomUUID` or `navigator.clipboard` without a fallback.
-- New tabs are a screen in `src/screens/` plus an entry in `TABS` in
-  `App.tsx`. Navigation is `AppNav`: a floating bottom tab bar on phones and a
-  floating left sidebar from the `md` breakpoint up. Screens run underneath
-  it, so content scrolls behind the nav. Each screen pads its own scroll area
-  by `NAV_BOTTOM_SPACE` (the chat lifts its composer with
-  `--thread-bottom-inset`); `App.tsx` pads by `NAV_LEFT_SPACE`. Both come from
-  the `--nav-*-space` variables in `index.css`, which switch with the layout;
-  change them there when the nav's size changes.
-- The UI never calls a model or network API directly. Replies come through
-  the `ChatBackend` interface in `src/backend/`, so the store and UI do not
-  change when the backend does.
-- Add UI primitives with the shadcn CLI from `src-react/`
-  (`pnpm dlx shadcn@latest add <component>`), not by hand. assistant-ui
-  components come from its registry the same way
-  (`https://r.assistant-ui.com/<name>.json`).
-- Vendored components are ours to edit, but keep edits small and leave a
-  one-line comment saying why, so a later registry update can be merged.
+- Hermes has no `crypto` and no `Intl.RelativeTimeFormat`, and plain-http web
+  pages have no `crypto.randomUUID`. Use `newId()` from `lib/id.ts` and
+  `timeAgo()` from `lib/time.ts`.
+- New tabs are a screen in `screens/` plus an entry in `SCREENS` and `tabs` in
+  `app/index.tsx`. Navigation is `AppNav`: a floating bottom tab bar on phones
+  and a floating left sidebar from 768px up. Screens run underneath it and pad
+  themselves with `useNavInsets()` from `components/layout.ts`; change the
+  constants there when the nav's size changes.
+- The UI never calls a model or network API directly. Replies come through the
+  `ChatBackend` interface in `backend/`, so the store and UI do not change when
+  the backend does.
+- UI primitives come from gluestack-ui: add them with its CLI from
+  `src-native/` (`npx gluestack-ui@latest add <component>`), not by hand.
+  assistant-ui elements come from its native registry
+  (`npx assistant-ui@latest add <element>`, which reads `components.json`).
+  Use React Native's own `View`, `Text` and `Pressable` for layout.
+- Vendored components (`components/ui/`, `components/assistant-ui/`) are ours
+  to edit, but keep edits small and mark each with a `Chottu:` comment saying
+  why, so a later registry update can be merged. The thread
+  (`thread.aui.tsx`) takes Chottu's `insets` prop and `ComposerExtra` /
+  `ComposerOverlay` slots that way.
 - Import through the `@/` alias, not long relative paths.
-- Style with Tailwind classes and the theme tokens in `index.css`. Do not add
-  hard-coded colours; light and dark both come from the tokens (add a token,
-  with a value in both themes, as was done for `bubble-user`,
-  `bubble-assistant` and `chat-bg`). The chat wallpaper is the `.chat-wallpaper`
-  class in `index.css`; its doodle tile is an inline SVG data URL, so use
-  single quotes inside it.
-- Dark mode is the `dark` class on `<html>`, set by `useApplyTheme` from the
-  theme store. Do not read `prefers-color-scheme` anywhere else.
+- Style with Tailwind classes (Uniwind). Every colour is a token in
+  `global.css`, declared directly as `--color-*` under `@layer theme` with a
+  light and a dark value; Uniwind only resolves that form on native. Do not
+  hard-code colours in components; when JS needs a token's value (SVG strokes,
+  placeholder colours), read it with `useCSSVariable`.
+- The theme preference lives in `store/theme.ts` and reaches the app through
+  `GluestackUIProvider mode`, which switches Uniwind's theme. Nothing else
+  reads the colour scheme.
 - There is no header bar. The chat screen has a floating `TopBar` with
-  Chottu's avatar and name.
+  Chottu's avatar, name and the call button.
 
 ## Build And Test
 
@@ -141,32 +112,31 @@ Run commands from the repository root unless noted.
 ```bash
 pnpm install
 
-pnpm dev                 # frontend only, in a browser at http://localhost:1420
-pnpm build               # type-check + production build into src-react/dist
-pnpm test                # Vitest suite (src-react)
+pnpm dev                 # web at http://localhost:1420
+pnpm start               # Expo dev server for devices (Expo Go / dev build)
+pnpm ios                 # native iOS build; macOS + Xcode only
+pnpm android             # native Android build; needs the Android SDK
+pnpm test                # Vitest suite (src-native)
+pnpm typecheck           # tsc
+pnpm build               # web export into src-native/dist
 
-pnpm desktop:dev         # desktop app with hot reload
-pnpm desktop:build       # release bundles for the host platform
-
-pnpm android:init        # once per checkout; needs Android SDK, NDK and Java
-pnpm android:dev
-pnpm ios:init            # once; macOS + Xcode only
-pnpm ios:dev
+pnpm desktop:dev         # desktop app around the web dev server
+pnpm desktop:build       # desktop bundles for the host platform
 
 cargo fmt --all
 cargo clippy --workspace --all-targets
 ```
 
-`pnpm desktop <cmd>` and `pnpm mobile <cmd>` forward any Tauri CLI command to
-the right crate by setting `TAURI_APP_PATH`, for example
-`pnpm desktop add <plugin>`. Avoid plain `pnpm tauri` unless you set
-`TAURI_APP_PATH` yourself; with two Tauri crates in the tree it can pick the
-wrong one.
+`pnpm desktop <cmd>` forwards any Tauri CLI command to the desktop crate by
+setting `TAURI_APP_PATH`, for example `pnpm desktop add <plugin>`.
 
-Before reporting work done, run at least `pnpm build`, `pnpm test` and
-`cargo clippy --workspace --all-targets` and read their output. For UI
-changes, also launch the app (`pnpm dev` or `pnpm desktop:dev`) and check the
-change on screen.
+Before reporting work done, run at least `pnpm test`, `pnpm typecheck`,
+`pnpm build` and `cargo clippy --workspace --all-targets` and read their
+output. For UI changes, also run the app (`pnpm dev`, a device, or
+`pnpm desktop:dev`) and check the change on screen, in light and dark.
+
+Do not start the Expo dev server with `CI=1`: CI mode turns off Metro's file
+watching, so edits never reach the page.
 
 Never send build output to a temp directory and never export
 `CARGO_TARGET_DIR`; the shared target directory is configured for you.
@@ -179,6 +149,8 @@ TypeScript:
   get past the compiler; fix the type.
 - Function components and hooks only. Keep components small; move logic that
   is not rendering into the store or a hook.
+- Give every control an accessibility role and label; screen readers are a
+  first-class way to use a voice-first app.
 - Prefer files under roughly 300 lines and split by responsibility. Vendored
   registry components are exempt.
 
@@ -199,14 +171,18 @@ Dependencies:
   small. Say why in the PR.
 - Tauri crates and npm packages stay on the same major version (Tauri 2).
   Use `pnpm desktop add <plugin>` so both sides are added together.
+- Add Expo modules with `npx expo install <module>` from `src-native/` so the
+  version matches the SDK, and run `npx expo install --fix` after upgrades.
+- Use one copy of each assistant-ui package; install only
+  `@assistant-ui/react-native`, never `@assistant-ui/react`.
 
 ## Testing
 
-- Frontend tests use Vitest (`pnpm test`), colocated as `*.test.ts` / `*.test.tsx` next to
-  the code they cover. Test the store and the backend behind their interfaces,
-  not component internals. `src/store/chat.test.ts` shows the pattern:
-  stub globals with `vi.stubGlobal`, `vi.resetModules()`, then import the
-  store fresh.
+- Tests use Vitest (`pnpm test`), colocated as `*.test.ts` next to the code
+  they cover. Test the stores, backend and helpers behind their interfaces,
+  not component internals. `store/chat.test.ts` shows the pattern: mock
+  `@/lib/storage` (AsyncStorage is a native module), stub globals with
+  `vi.stubGlobal`, `vi.resetModules()`, then import the store fresh.
 - There are no Rust tests yet. When you add them, they go in `<module>_tests.rs` beside the module, not in an inline
   `#[cfg(test)] mod tests` block.
 - Tests never call real model APIs or other third-party services; use the
@@ -215,7 +191,7 @@ Dependencies:
 
 ## Configuration and Security
 
-- Keep each `tauri.conf.json` CSP strict. Loosen it only for a named origin
+- Keep the desktop `tauri.conf.json` CSP strict. Loosen it only for a named origin
   the app really needs, and say why in the PR.
 - Grant the narrowest capability that works. Prefer a plugin's specific
   permissions over `:default` when you add a new one.
@@ -223,6 +199,9 @@ Dependencies:
   arrive, document them in `.env.example` with placeholder values.
 - The deep-link scheme is `chottu://`. Treat everything that arrives through
   it as untrusted input.
+- Ask for a native permission (microphone, notifications, …) only in
+  `app.json` and only when a feature needs it, with a usage string that says
+  why.
 
 ## Git Workflow
 
