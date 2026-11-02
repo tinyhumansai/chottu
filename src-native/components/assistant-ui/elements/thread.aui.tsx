@@ -852,8 +852,9 @@ const AssistantMessage: FC = () => {
 
   return (
     <MessagePrimitive.Root className="aui-assistant-message-root">
+      <MessageActionsRow side="start" actions={<AssistantActionBar />}>
       {/* Chottu: replies sit in a bubble too. */}
-      <View className="aui-assistant-message-content bg-bubble-assistant max-w-[85%] self-start rounded-[20px] px-4 py-2 shadow-sm">
+      <View className="aui-assistant-message-content bg-bubble-assistant max-w-[85%] shrink rounded-[20px] px-4 py-2 shadow-sm">
         <MessagePrimitive.GroupedParts groupBy={groupBy}>
           {({ part, children }) => {
             switch (part.type) {
@@ -899,13 +900,55 @@ const AssistantMessage: FC = () => {
         </MessagePrimitive.GroupedParts>
         <MessageError />
       </View>
-      <View className="aui-assistant-message-footer ms-2 min-h-7.5 flex-row items-center pt-1.5">
-        <BranchPicker />
-        <AssistantActionBar />
-      </View>
+      </MessageActionsRow>
+      <BranchFooter className="aui-assistant-message-footer ms-2" />
     </MessagePrimitive.Root>
   );
 };
+
+// Chottu: message actions (copy, retry, edit) sit beside the bubble and show
+// on hover (web, desktop) or long press (touch), instead of under every
+// message. They keep their space while hidden so nothing shifts, and stay
+// reachable for keyboards and screen readers.
+const MessageActionsRow: FC<{
+  side: "start" | "end";
+  actions: ReactNode;
+  children: ReactNode;
+}> = ({ side, actions, children }) => {
+  const [shown, setShown] = useState(false);
+  return (
+    <Pressable
+      accessible={false}
+      onHoverIn={() => setShown(true)}
+      onHoverOut={() => setShown(false)}
+      onLongPress={() => setShown((v) => !v)}
+      delayLongPress={350}
+      className={cn(
+        "web:cursor-auto flex-row items-end gap-1",
+        side === "end" && "flex-row-reverse",
+      )}
+    >
+      {children}
+      <View
+        className={cn(
+          "web:transition-opacity web:focus-within:opacity-100 pb-0.5",
+          !shown && "opacity-0",
+        )}
+      >
+        {actions}
+      </View>
+    </Pressable>
+  );
+};
+
+/** Chottu: the branch picker gets a footer row only when there are branches. */
+const BranchFooter: FC<{ className?: string }> = ({ className }) => (
+  <AuiIf condition={(s) => s.message.branchCount > 1}>
+    <View className={cn("flex-row items-center pt-1", className)}>
+      <BranchPicker />
+    </View>
+  </AuiIf>
+);
 
 const AssistantActionBar: FC = () => (
   <AuiIf
@@ -913,7 +956,7 @@ const AssistantActionBar: FC = () => (
       !(s.message.role === "assistant" && s.message.status?.type === "running")
     }
   >
-    <View className="aui-assistant-action-bar-root -ms-1 flex-row gap-1">
+    <View className="aui-assistant-action-bar-root flex-row">
       <ActionBarPrimitive.Copy
         copyToClipboard={copyToClipboard}
         className={iconButtonClassName}
@@ -942,8 +985,9 @@ const UserMessage: FC = () => (
   <MessagePrimitive.Root className="aui-user-message-root items-end gap-y-2 px-2">
     <UserMessageAttachments />
     <AuiIf condition={(s) => s.message.parts.length > 0}>
+      <MessageActionsRow side="end" actions={<UserActionBar />}>
       {/* Chottu: user bubble colours, and voice notes render in user messages too. */}
-      <View className="aui-user-message-content bg-bubble-user max-w-[85%] rounded-[20px] px-4 py-2 shadow-sm">
+      <View className="aui-user-message-content bg-bubble-user max-w-[85%] shrink rounded-[20px] px-4 py-2 shadow-sm">
         <MessagePrimitive.Parts
           components={{
             Text: UserText,
@@ -953,16 +997,18 @@ const UserMessage: FC = () => (
           }}
         />
       </View>
+      </MessageActionsRow>
     </AuiIf>
-    <View className="aui-user-message-footer -me-1 flex-row items-center justify-end">
-      <BranchPicker />
-      <UserActionBar />
-    </View>
+    <BranchFooter className="aui-user-message-footer -me-1 justify-end" />
   </MessagePrimitive.Root>
 );
 
 const UserActionBar: FC = () => (
-  <AuiIf condition={(s) => !s.thread.isRunning}>
+  <AuiIf
+    condition={(s) =>
+      !s.thread.isRunning && s.message.parts.some((p) => p.type === "text")
+    }
+  >
     <ActionBarPrimitive.Edit
       className={cn(iconButtonClassName, "aui-user-action-edit")}
       hitSlop={groupedIconButtonHitSlop}
