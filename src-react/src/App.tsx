@@ -41,13 +41,14 @@ function useSystemTheme() {
 
 export default function App() {
   useSystemTheme();
-  const { messages, isRunning, send, cancel, clear } = useChatStore();
+  const { messages, isRunning, send, regenerate, cancel, clear } = useChatStore();
 
   const runtime = useExternalStoreRuntime({
     messages,
     isRunning,
     convertMessage: (m, idx) => convertMessage(m, idx, messages.length - 1, isRunning),
     onNew: (message) => send(textOf(message)),
+    onReload: (parentId) => regenerate(parentId),
     onCancel: async () => cancel(),
   });
 

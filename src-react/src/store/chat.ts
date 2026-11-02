@@ -15,6 +15,8 @@ type ChatState = {
   messages: ChatMessage[];
   isRunning: boolean;
   send: (text: string) => Promise<void>;
+  /** Drop everything after `parentId` and generate a fresh reply to it. */
+  regenerate: (parentId: string | null) => Promise<void>;
   cancel: () => void;
   clear: () => void;
 };
@@ -34,29 +36,41 @@ export const useChatStore = create<ChatState>()(
       const patch = (id: string, fn: (m: ChatMessage) => ChatMessage) =>
         set((s) => ({ messages: s.messages.map((m) => (m.id === id ? fn(m) : m)) }));
 
+      /** Streams an assistant reply to the current history. */
+      const reply = async () => {
+        const history = get().messages;
+        const draft = message("assistant", "");
+        set((s) => ({ messages: [...s.messages, draft], isRunning: true }));
+
+        controller = new AbortController();
+        try {
+          for await (const chunk of backend.streamReply(history, controller.signal)) {
+            patch(draft.id, (m) => ({ ...m, text: m.text + chunk }));
+          }
+        } catch (err) {
+          const reason = controller.signal.aborted ? "cancelled" : String(err);
+          patch(draft.id, (m) => ({ ...m, error: reason }));
+        } finally {
+          controller = null;
+          set({ isRunning: false });
+        }
+      };
+
       return {
         messages: [],
         isRunning: false,
 
         async send(text) {
           if (get().isRunning) return;
-          const user = message("user", text);
-          const reply = message("assistant", "");
-          set((s) => ({ messages: [...s.messages, user, reply], isRunning: true }));
+          set((s) => ({ messages: [...s.messages, message("user", text)] }));
+          await reply();
+        },
 
-          controller = new AbortController();
-          const history = get().messages.filter((m) => m.id !== reply.id);
-          try {
-            for await (const chunk of backend.streamReply(history, controller.signal)) {
-              patch(reply.id, (m) => ({ ...m, text: m.text + chunk }));
-            }
-          } catch (err) {
-            const reason = controller.signal.aborted ? "cancelled" : String(err);
-            patch(reply.id, (m) => ({ ...m, error: reason }));
-          } finally {
-            controller = null;
-            set({ isRunning: false });
-          }
+        async regenerate(parentId) {
+          if (get().isRunning) return;
+          const idx = get().messages.findIndex((m) => m.id === parentId);
+          set((s) => ({ messages: s.messages.slice(0, idx + 1) }));
+          await reply();
         },
 
         cancel() {
