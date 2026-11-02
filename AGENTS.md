@@ -85,8 +85,10 @@ src-tauri-mobile/          # crate `chottu-mobile`, lib `chottu_mobile_lib`
   secure context. Do not use secure-context-only APIs such as
   `crypto.randomUUID` or `navigator.clipboard` without a fallback.
 - New tabs are a screen in `src/screens/` plus an entry in `TABS` in
-  `App.tsx`. The bottom bar floats; screens get bottom padding from
-  `BOTTOM_BAR_SPACE` so nothing sits under it.
+  `App.tsx`. The bottom bar floats and screens run underneath it, so content
+  scrolls behind the bar. Each screen pads its own scroll area by
+  `BOTTOM_BAR_SPACE` (the chat lifts its composer with `--thread-bottom-inset`)
+  so the last item can still scroll clear of the bar.
 - The UI never calls a model or network API directly. Replies come through
   the `ChatBackend` interface in `src/backend/`, so the store and UI do not
   change when the backend does.
