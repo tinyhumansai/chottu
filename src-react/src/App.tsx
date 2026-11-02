@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { MessageCircle, Settings } from "lucide-react";
 import { BOTTOM_BAR_SPACE, BottomBar, type Tab } from "@/components/bottom-bar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useDeepLinkMessages } from "@/hooks/use-deep-link-messages";
 import { ChatScreen } from "@/screens/chat-screen";
 import { SettingsScreen } from "@/screens/settings-screen";
+import { useApplyTheme } from "@/store/theme";
 
 type TabId = "chat" | "settings";
 
@@ -13,18 +14,8 @@ const TABS: readonly Tab<TabId>[] = [
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
-function useSystemTheme() {
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-color-scheme: dark)");
-    const apply = () => document.documentElement.classList.toggle("dark", query.matches);
-    apply();
-    query.addEventListener("change", apply);
-    return () => query.removeEventListener("change", apply);
-  }, []);
-}
-
 export default function App() {
-  useSystemTheme();
+  useApplyTheme();
   useDeepLinkMessages();
   const [tab, setTab] = useState<TabId>("chat");
 
