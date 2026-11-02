@@ -26,17 +26,26 @@ pnpm-workspace.yaml        # workspace members: src-react
 src-react/                 # the frontend, pnpm package `chottu-react`
 ├── src/
 │   ├── App.tsx            # app shell: screens + floating bottom bar
-│   ├── screens/           # one file per nav tab (chat, settings)
+│   ├── screens/           # one file per nav tab: chat, wallet, ideas,
+│   │                      # apps (mini-apps), settings
 │   ├── store/chat.ts      # zustand store: messages of any part type,
 │   │                      # register, send, regenerate, cancel, clear;
 │   │                      # persisted to localStorage (versioned)
 │   ├── store/theme.ts     # zustand store: system/light/dark preference
+│   ├── store/ui.ts        # active tab (any screen can switch tabs)
+│   ├── store/wallet.ts    # balance + transactions (sample data for now)
+│   ├── store/ideas.ts     # suggestions, schedules (crons), notifications
+│   ├── store/call.ts      # voice call with Chottu (connection mocked)
+│   ├── voice-notes/       # voice notes: recorder hook, player, composer mic
+│   │                      # button, `data-voice-note` message part, demo synth
+│   ├── mini-apps/registry.ts # the mini-apps list
+│   ├── lib/ask-chottu.ts  # `askChottu(prompt)`: jump to chat and send
 │   ├── backend/           # the reply source behind `ChatBackend`
 │   │                      # (mock today; swap for a real model client)
 │   ├── components/ui/     # shadcn components (vendored by the shadcn CLI)
 │   ├── components/assistant-ui/ # assistant-ui registry components (vendored)
-│   ├── components/        # our own components (app-nav, top-bar,
-│   │                      # chottu-avatar)
+│   ├── components/        # our own components (app-nav, top-bar, page,
+│   │                      # call-screen, chottu-avatar)
 │   ├── hooks/             # app hooks + hooks pulled in by registry components
 │   ├── lib/utils.ts       # `cn()` helper
 │   ├── lib/id.ts          # `newId()`; use it, never `crypto.randomUUID`
@@ -79,6 +88,18 @@ src-tauri-mobile/          # crate `chottu-mobile`, lib `chottu_mobile_lib`
   Messages hold assistant-ui parts, so text, images, files, reasoning,
   tool calls and `data-*` parts all fit. Image URLs must be `https:`,
   `blob:` or `data:image/…`; assistant-ui drops anything else.
+- A new `send` stops a reply that is still streaming (it is kept, marked
+  cancelled) rather than being dropped, so `askChottu()` from any tab always
+  lands. Do not reintroduce an "ignore while running" guard.
+- Voice notes are `data-voice-note` parts (`voice-notes/types.ts`) holding a
+  data: URL, duration and waveform, rendered for both roles. assistant-ui's
+  own `audio` part is user-only and mp3/wav-only, so do not switch to it.
+  Recording needs a secure context; the mic button disables itself over
+  plain http.
+- Sample data (wallet, ideas, mini-apps, the dev-only "Load sample chat")
+  lives in the stores and registry and is marked as such; replace it with
+  backend data rather than adding more.
+- Non-chat tabs use `Page` / `Section` / `Card` from `components/page.tsx`.
 - If you change the persisted message shape, bump the store's persist
   `version` and add a `migrate` step so existing chats keep loading.
 - The app is also served over plain http (LAN, phone testing), which is not a

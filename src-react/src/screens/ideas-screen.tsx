@@ -62,9 +62,8 @@ export function IdeasScreen() {
               <CalendarClock className="text-muted-foreground size-4 shrink-0" />
               <div className="min-w-0 flex-1">
                 <p className="font-medium">{c.title}</p>
-                <p className="text-muted-foreground text-sm">
-                  {c.body} <code className="text-xs">{c.cron}</code>
-                </p>
+                <p className="text-muted-foreground text-sm">{c.body}</p>
+                <code className="text-muted-foreground text-xs whitespace-nowrap">{c.cron}</code>
               </div>
               <Switch checked={c.enabled} onCheckedChange={() => toggleSchedule(c.id)} aria-label={c.title} />
             </label>
