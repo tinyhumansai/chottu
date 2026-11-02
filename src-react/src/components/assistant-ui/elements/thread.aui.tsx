@@ -225,11 +225,11 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean }> = ({
 
   return (
     <ThreadPrimitive.Root
-      className="aui-root aui-thread-root bg-background @container flex h-full flex-col"
+      // Chottu: transparent so the chat wallpaper behind the thread shows through.
+      className="aui-root aui-thread-root @container flex h-full flex-col bg-transparent"
       style={{
         ["--thread-max-width" as string]: "44rem",
-        ["--composer-bg" as string]:
-          "color-mix(in oklab, var(--color-muted) 30%, transparent)",
+        ["--composer-bg" as string]: "var(--color-background)",
         ["--composer-radius" as string]: "1rem",
         ["--composer-padding" as string]: "8px",
       }}
@@ -267,7 +267,7 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean }> = ({
           <ThreadPrimitive.ViewportFooter
             className={cn(
               // Chottu: small bottom gap; the floating bottom bar sits right below.
-              "aui-thread-viewport-footer bg-background flex flex-col gap-4 overflow-visible pb-2",
+              "aui-thread-viewport-footer flex flex-col gap-4 overflow-visible pb-2",
               !isEmpty &&
                 "sticky bottom-0 mt-auto rounded-t-(--composer-radius)",
             )}
@@ -695,7 +695,7 @@ const AssistantMessage: FC = () => {
       <div
         data-slot="aui_assistant-message-content"
         // Chottu: replies sit in a bubble, like the user's messages.
-        className="bg-muted text-foreground w-fit max-w-[90%] rounded-[1.25rem] px-4 py-2.5 leading-relaxed wrap-break-word empty:hidden [&_p:first-child]:mt-0 [&_p:last-child]:mb-0"
+        className="bg-bubble-assistant text-foreground w-fit max-w-[90%] rounded-[1.25rem] shadow-[0_1px_1px_rgb(0_0_0/0.08)] px-4 py-2.5 leading-relaxed wrap-break-word empty:hidden [&_p:first-child]:mt-0 [&_p:last-child]:mb-0"
       >
         <MessagePrimitive.GroupedParts groupBy={groupBy}>
           {({ part, children }) => {

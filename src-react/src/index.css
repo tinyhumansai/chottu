@@ -30,6 +30,8 @@
     --color-accent: var(--accent);
     --color-muted-foreground: var(--muted-foreground);
     --color-bubble-user: var(--bubble-user);
+    --color-bubble-assistant: var(--bubble-assistant);
+    --color-chat-bg: var(--chat-bg);
     --color-bubble-user-foreground: var(--bubble-user-foreground);
     --color-muted: var(--muted);
     --color-secondary-foreground: var(--secondary-foreground);
@@ -81,6 +83,9 @@
     --muted: oklch(0.97 0 0);
     --muted-foreground: oklch(0.556 0 0);
     --bubble-user: oklch(0.9 0.05 240);
+    --bubble-assistant: oklch(1 0 0);
+    --chat-bg: #efeae2;
+    --chat-pattern: url("data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" fill="none" stroke="rgba(84,72,52,0.10)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"%3E %3Cpath d="M14 18h22a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H26l-7 6v-6h-5a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6z"/%3E %3Cpath d="M104 22c-4-6-14-3-12 5 2 6 12 11 12 11s10-5 12-11c2-8-8-11-12-5z"/%3E %3Cpath d="M58 70l3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z"/%3E %3Cpath d="M132 70v12M126 76h12"/%3E %3Cpath d="M12 104c6-6 12 6 18 0s12 6 18 0"/%3E %3Ccircle cx="88" cy="118" r="11"/%3E%3Cpath d="M83 121q5 4 10 0"/%3E%3Cpath d="M84 114h.01M92 114h.01"/%3E %3Cpath d="M124 120h24a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5h-3v6l-7-6h-14a5 5 0 0 1-5-5v-8a5 5 0 0 1 5-5z"/%3E %3Ccircle cx="60" cy="20" r="2"/%3E%3Ccircle cx="146" cy="40" r="2"/%3E%3Ccircle cx="30" cy="140" r="2"/%3E%3Ccircle cx="114" cy="80" r="1.5"/%3E %3Cpath d="M28 66l3 3-3 3-3-3z"/%3E %3C/svg%3E");
     --bubble-user-foreground: oklch(0.2 0.03 250);
     --accent: oklch(0.97 0 0);
     --accent-foreground: oklch(0.205 0 0);
@@ -118,6 +123,9 @@
     --muted: oklch(0.269 0 0);
     --muted-foreground: oklch(0.708 0 0);
     --bubble-user: oklch(0.36 0.08 250);
+    --bubble-assistant: oklch(0.27 0.02 230);
+    --chat-bg: #0e171c;
+    --chat-pattern: url("data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160" fill="none" stroke="rgba(220,235,240,0.06)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"%3E %3Cpath d="M14 18h22a6 6 0 0 1 6 6v10a6 6 0 0 1-6 6H26l-7 6v-6h-5a6 6 0 0 1-6-6V24a6 6 0 0 1 6-6z"/%3E %3Cpath d="M104 22c-4-6-14-3-12 5 2 6 12 11 12 11s10-5 12-11c2-8-8-11-12-5z"/%3E %3Cpath d="M58 70l3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z"/%3E %3Cpath d="M132 70v12M126 76h12"/%3E %3Cpath d="M12 104c6-6 12 6 18 0s12 6 18 0"/%3E %3Ccircle cx="88" cy="118" r="11"/%3E%3Cpath d="M83 121q5 4 10 0"/%3E%3Cpath d="M84 114h.01M92 114h.01"/%3E %3Cpath d="M124 120h24a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5h-3v6l-7-6h-14a5 5 0 0 1-5-5v-8a5 5 0 0 1 5-5z"/%3E %3Ccircle cx="60" cy="20" r="2"/%3E%3Ccircle cx="146" cy="40" r="2"/%3E%3Ccircle cx="30" cy="140" r="2"/%3E%3Ccircle cx="114" cy="80" r="1.5"/%3E %3Cpath d="M28 66l3 3-3 3-3-3z"/%3E %3C/svg%3E");
     --bubble-user-foreground: oklch(0.97 0.01 240);
     --accent: oklch(0.269 0 0);
     --accent-foreground: oklch(0.985 0 0);
@@ -155,3 +163,9 @@
 @custom-variant data-open (&:where([data-state="open"], [data-open]:not([data-open="false"])));
 
 @custom-variant data-closed (&:where([data-state="closed"], [data-closed]:not([data-closed="false"])));
+/* Chat wallpaper: a warm (or deep, in dark mode) colour with a faint doodle tile. */
+.chat-wallpaper {
+  background-color: var(--chat-bg);
+  background-image: var(--chat-pattern);
+  background-size: 160px 160px;
+}

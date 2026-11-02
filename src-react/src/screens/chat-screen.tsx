@@ -35,7 +35,7 @@ export function ChatScreen() {
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <div className="relative min-h-0 flex-1" style={{ ["--thread-top-inset" as string]: TOP_BAR_SPACE }}>
+      <div className="chat-wallpaper relative min-h-0 flex-1" style={{ ["--thread-top-inset" as string]: TOP_BAR_SPACE }}>
         <TopBar action={<AppMenu />} />
         <Thread />
       </div>
