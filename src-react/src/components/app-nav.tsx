@@ -2,7 +2,13 @@ import type { LucideIcon } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
-export type Tab<T extends string> = { id: T; label: string; icon: LucideIcon };
+export type Tab<T extends string> = {
+  id: T;
+  label: string;
+  icon: LucideIcon;
+  /** Small count shown on the icon (e.g. unseen ideas); hidden when 0 or missing. */
+  badge?: number;
+};
 
 type AppNavProps<T extends string> = {
   tabs: readonly Tab<T>[];
@@ -53,13 +59,13 @@ function NavButtons<T extends string>({
   className,
   tooltipSide,
 }: AppNavProps<T> & { className: string; tooltipSide?: "right" }) {
-  return tabs.map(({ id, label, icon: Icon }) => {
+  return tabs.map(({ id, label, icon: Icon, badge }) => {
     const selected = id === active;
     const button = (
       <button
         key={id}
         type="button"
-        aria-label={label}
+        aria-label={badge ? `${label} (${badge} new)` : label}
         title={tooltipSide ? undefined : label}
         aria-current={selected ? "page" : undefined}
         onClick={() => onChange(id)}
@@ -71,7 +77,14 @@ function NavButtons<T extends string>({
             : "text-muted-foreground hover:bg-muted/60 hover:text-foreground",
         )}
       >
-        <Icon className={tooltipSide ? "size-6" : "size-5"} strokeWidth={1.75} />
+        <span className="relative">
+          <Icon className={tooltipSide ? "size-6" : "size-5"} strokeWidth={1.75} />
+          {!!badge && (
+            <span className="bg-destructive absolute -top-1.5 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] leading-none font-semibold text-white">
+              {badge}
+            </span>
+          )}
+        </span>
       </button>
     );
     if (!tooltipSide) return button;
