@@ -3,7 +3,7 @@
  * the assistant's reply as text chunks. Swap `mockBackend` for a real one
  * (an LLM API, a Tauri command over a Channel, …) without touching the UI or store.
  */
-export type ChatTurn = { role: "user" | "assistant"; text: string };
+export type ChatTurn = { role: "user" | "assistant" | "system"; text: string };
 
 export type ChatBackend = {
   streamReply(history: readonly ChatTurn[], signal: AbortSignal): AsyncIterable<string>;
