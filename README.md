@@ -42,8 +42,8 @@ and [assistant-ui](https://www.assistant-ui.com):
   message of any kind (text, image, file, tool call, …) with
   `useChatStore.getState().register({ role, content })`; `chottu://` deep links already do. In
   `pnpm dev` the store is also on `window.chottuChat` for trying this from the console
-- `src/screens/` + `src/components/bottom-bar.tsx`: the Chat and Settings tabs and the floating
-  bottom bar that switches between them
+- `src/screens/` + `src/components/app-nav.tsx`: the Chat and Settings tabs, switched by a
+  floating bottom tab bar on phones and a floating left sidebar on desktop
 - `src/backend/`: the reply source. It is a mock that echoes and streams word by word; replace
   `backend` with a real model client
 - `src/App.tsx`: connects the store to assistant-ui through `useExternalStoreRuntime`

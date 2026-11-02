@@ -26,7 +26,7 @@ pnpm-workspace.yaml        # workspace members: src-react
 src-react/                 # the frontend, pnpm package `chottu-react`
 ├── src/
 │   ├── App.tsx            # app shell: screens + floating bottom bar
-│   ├── screens/           # one file per bottom-bar tab (chat, settings)
+│   ├── screens/           # one file per nav tab (chat, settings)
 │   ├── store/chat.ts      # zustand store: messages of any part type,
 │   │                      # register, send, regenerate, cancel, clear;
 │   │                      # persisted to localStorage (versioned)
@@ -35,7 +35,7 @@ src-react/                 # the frontend, pnpm package `chottu-react`
 │   │                      # (mock today; swap for a real model client)
 │   ├── components/ui/     # shadcn components (vendored by the shadcn CLI)
 │   ├── components/assistant-ui/ # assistant-ui registry components (vendored)
-│   ├── components/        # our own components (bottom-bar, top-bar, app-menu,
+│   ├── components/        # our own components (app-nav, top-bar,
 │   │                      # chottu-avatar)
 │   ├── hooks/             # app hooks + hooks pulled in by registry components
 │   ├── lib/utils.ts       # `cn()` helper
@@ -85,10 +85,13 @@ src-tauri-mobile/          # crate `chottu-mobile`, lib `chottu_mobile_lib`
   secure context. Do not use secure-context-only APIs such as
   `crypto.randomUUID` or `navigator.clipboard` without a fallback.
 - New tabs are a screen in `src/screens/` plus an entry in `TABS` in
-  `App.tsx`. The bottom bar floats and screens run underneath it, so content
-  scrolls behind the bar. Each screen pads its own scroll area by
-  `BOTTOM_BAR_SPACE` (the chat lifts its composer with `--thread-bottom-inset`)
-  so the last item can still scroll clear of the bar.
+  `App.tsx`. Navigation is `AppNav`: a floating bottom tab bar on phones and a
+  floating left sidebar from the `md` breakpoint up. Screens run underneath
+  it, so content scrolls behind the nav. Each screen pads its own scroll area
+  by `NAV_BOTTOM_SPACE` (the chat lifts its composer with
+  `--thread-bottom-inset`); `App.tsx` pads by `NAV_LEFT_SPACE`. Both come from
+  the `--nav-*-space` variables in `index.css`, which switch with the layout;
+  change them there when the nav's size changes.
 - The UI never calls a model or network API directly. Replies come through
   the `ChatBackend` interface in `src/backend/`, so the store and UI do not
   change when the backend does.
@@ -107,8 +110,8 @@ src-tauri-mobile/          # crate `chottu-mobile`, lib `chottu_mobile_lib`
   single quotes inside it.
 - Dark mode is the `dark` class on `<html>`, set by `useApplyTheme` from the
   theme store. Do not read `prefers-color-scheme` anywhere else.
-- There is no header bar. The chat screen has a floating `TopBar` (Chottu's
-  avatar and name, the `AppMenu` hamburger); app-level actions go in that menu.
+- There is no header bar. The chat screen has a floating `TopBar` with
+  Chottu's avatar and name.
 
 ## Build And Test
 
