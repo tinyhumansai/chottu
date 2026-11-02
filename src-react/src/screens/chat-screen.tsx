@@ -6,6 +6,8 @@ import {
 import { Thread } from "@/components/assistant-ui/elements/thread.aui";
 import { NAV_BOTTOM_SPACE } from "@/components/app-nav";
 import { TOP_BAR_SPACE, TopBar } from "@/components/top-bar";
+import { VoiceNoteButton } from "@/voice-notes/composer-button";
+import { VoiceNoteDataUI } from "@/voice-notes/message-part";
 import { useChatStore, type ChatMessage, type ChatPart } from "@/store/chat";
 
 const statusOf = (m: ChatMessage, isStreaming: boolean): ThreadMessageLike["status"] => {
@@ -40,7 +42,8 @@ export function ChatScreen() {
           ["--thread-bottom-inset" as string]: NAV_BOTTOM_SPACE,
         }}>
         <TopBar />
-        <Thread />
+        <Thread components={{ ComposerExtra: VoiceNoteButton }} />
+        <VoiceNoteDataUI />
       </div>
     </AssistantRuntimeProvider>
   );

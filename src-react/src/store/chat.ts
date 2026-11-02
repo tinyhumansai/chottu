@@ -50,9 +50,18 @@ const toMessage = ({ role, content, id, createdAt }: NewMessage): ChatMessage =>
   createdAt: createdAt ?? Date.now(),
 });
 
-/** Plain-text view of a message, for backends that only take text. */
+/** Plain-text view of a message, for backends that only take text. Voice notes become `[voice note m:ss]`. */
 export const textOf = (m: Pick<ChatMessage, "content">) =>
-  m.content.map((p) => (p.type === "text" ? p.text : "")).join("");
+  m.content
+    .map((p) => {
+      if (p.type === "text") return p.text;
+      if (p.type === "data-voice-note") {
+        const s = Math.round(((p.data as { durationMs?: number })?.durationMs ?? 0) / 1000);
+        return `[voice note ${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}]`;
+      }
+      return "";
+    })
+    .join("");
 
 const appendText = (m: ChatMessage, chunk: string): ChatMessage => {
   const last = m.content.at(-1);

@@ -26,6 +26,8 @@ import { TooltipIconButton } from "@/components/assistant-ui/elements/tooltip-ic
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { VoiceNotePart } from "@/voice-notes/message-part";
+import { VOICE_NOTE } from "@/voice-notes/types";
 import {
   ActionBarMorePrimitive,
   ActionBarPrimitive,
@@ -559,8 +561,9 @@ const ComposerAction: FC = () => {
       !(s.thread.isRunning && s.thread.capabilities.cancel),
   );
 
+  // Chottu: not `relative`, so ComposerExtra overlays (voice recording) can cover the whole composer.
   return (
-    <div className="aui-composer-action-wrapper relative flex shrink-0 items-center gap-1">
+    <div className="aui-composer-action-wrapper flex shrink-0 items-center gap-1">
       {ComposerExtra ? (
         <div className="aui-composer-action-start flex items-center gap-1.5">
           <ComposerAddAttachment />
@@ -887,7 +890,12 @@ const UserMessage: FC = () => {
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
         <div className="aui-user-message-content peer bg-bubble-user text-bubble-user-foreground rounded-[1.25rem] shadow-[0_1px_1px_rgb(0_0_0/0.08)] px-4 py-2.5 wrap-break-word empty:hidden">
           <MessagePrimitive.Parts
-            components={{ File: UserFilePart, Image: UserImagePart }}
+            components={{
+              File: UserFilePart,
+              Image: UserImagePart,
+              // Chottu: voice notes the user sent.
+              data: { by_name: { [VOICE_NOTE]: VoiceNotePart } },
+            }}
           />
         </div>
         <div className="aui-user-action-bar-wrapper absolute start-0 top-1/2 -translate-x-full -translate-y-1/2 pe-2 peer-empty:hidden rtl:translate-x-full">
