@@ -1,5 +1,6 @@
 import { VoiceNotePart } from "@/voice-notes/message-part";
 import { VOICE_NOTE } from "@/voice-notes/types";
+import { useCSSVariable } from "uniwind";
 import {
   UserMessageAttachments,
 } from "@/components/assistant-ui/elements/attachment.aui";
@@ -665,16 +666,15 @@ const ThreadSuggestionItem: FC = () => (
   </SuggestionPrimitive.Trigger>
 );
 
-// The placeholder color is a class to prop mapping that reads the CSSOM, so it applies from the first render after hydration.
+// Chottu: the placeholder colour comes straight from the theme token; Uniwind's
+// `accent-*` class extraction finds no colour in our tokens on web.
 const DefaultComposerInput: FC = () => {
-  const hydrated = useHydrated();
+  const placeholder = useCSSVariable("--color-muted-foreground");
 
   return (
     <ComposerPrimitive.Input
       placeholder="Message Chottu"
-      placeholderTextColorClassName={
-        hydrated ? "accent-muted-foreground" : undefined // Chottu: Uniwind cannot extract an accent colour with an opacity modifier
-      }
+      placeholderTextColor={placeholder === undefined ? undefined : String(placeholder)}
       // Chottu: one line tall until you type more.
       className="aui-composer-input text-foreground web:resize-none web:outline-none max-h-36 min-h-9 flex-1 px-3 py-1.5 text-base leading-6"
       multiline
