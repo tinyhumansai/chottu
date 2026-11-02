@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+// AsyncStorage is a native module; in tests the stores persist to the
+// stubbed localStorage below instead.
+vi.mock("@/lib/storage", async () => {
+  const { createJSONStorage } = await import("zustand/middleware");
+  return { appStorage: createJSONStorage(() => localStorage) };
+});
+
 // Pages served over plain http on a LAN or public IP are not a secure context,
 // so browsers leave `crypto.randomUUID` undefined there.
 function insecureContext() {
