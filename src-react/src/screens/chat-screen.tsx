@@ -3,9 +3,9 @@ import {
   useExternalStoreRuntime,
   type ThreadMessageLike,
 } from "@assistant-ui/react";
-import { SquarePen } from "lucide-react";
 import { Thread } from "@/components/assistant-ui/elements/thread.aui";
-import { TOP_BAR_SPACE, TopBar, TopBarButton } from "@/components/top-bar";
+import { AppMenu } from "@/components/app-menu";
+import { TOP_BAR_SPACE, TopBar } from "@/components/top-bar";
 import { useChatStore, type ChatMessage, type ChatPart } from "@/store/chat";
 
 const statusOf = (m: ChatMessage, isStreaming: boolean): ThreadMessageLike["status"] => {
@@ -15,7 +15,7 @@ const statusOf = (m: ChatMessage, isStreaming: boolean): ThreadMessageLike["stat
 };
 
 export function ChatScreen() {
-  const { messages, isRunning, send, regenerate, cancel, clear } = useChatStore();
+  const { messages, isRunning, send, regenerate, cancel } = useChatStore();
   const lastIdx = messages.length - 1;
 
   const runtime = useExternalStoreRuntime({
@@ -36,13 +36,7 @@ export function ChatScreen() {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <div className="relative min-h-0 flex-1" style={{ ["--thread-top-inset" as string]: TOP_BAR_SPACE }}>
-        <TopBar
-          action={
-            <TopBarButton label="New chat" onClick={clear} disabled={messages.length === 0}>
-              <SquarePen />
-            </TopBarButton>
-          }
-        />
+        <TopBar action={<AppMenu />} />
         <Thread />
       </div>
     </AssistantRuntimeProvider>

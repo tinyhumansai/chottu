@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { ChottuAvatar } from "@/components/chottu-avatar";
+import { cn } from "@/lib/utils";
 
 /** Space the floating top bar takes, for content that scrolls beneath it. */
 export const TOP_BAR_SPACE = "calc(6.5rem + env(safe-area-inset-top))";
@@ -23,21 +24,18 @@ export function TopBar({ action }: { action?: ReactNode }) {
   );
 }
 
-/** A round floating button for the top bar's corner. */
-export function TopBarButton({ label, onClick, disabled, children }: {
-  label: string;
-  onClick: () => void;
-  disabled?: boolean;
-  children: ReactNode;
-}) {
+/** A round floating button for the top bar's corner. Spreads props so it works as a menu trigger. */
+export function TopBarButton({ label, className, children, ...props }: ComponentProps<"button"> & { label: string }) {
   return (
     <button
       type="button"
       aria-label={label}
       title={label}
-      onClick={onClick}
-      disabled={disabled}
-      className="bg-background text-foreground hover:bg-muted flex size-11 items-center justify-center rounded-full shadow-[0_4px_20px_-4px_rgb(0_0_0/0.12)] transition-colors disabled:opacity-40 dark:shadow-[0_4px_20px_-4px_rgb(0_0_0/0.6)] dark:ring-1 dark:ring-white/10 [&_svg]:size-5"
+      className={cn(
+        "bg-background text-foreground hover:bg-muted data-[state=open]:bg-muted flex size-11 items-center justify-center rounded-full shadow-[0_4px_20px_-4px_rgb(0_0_0/0.12)] transition-colors disabled:opacity-40 dark:shadow-[0_4px_20px_-4px_rgb(0_0_0/0.6)] dark:ring-1 dark:ring-white/10 [&_svg]:size-5",
+        className,
+      )}
+      {...props}
     >
       {children}
     </button>
