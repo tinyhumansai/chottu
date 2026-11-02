@@ -34,7 +34,7 @@ src-react/                 # the frontend, pnpm package `chottu-react`
 │   │                      # (mock today; swap for a real model client)
 │   ├── components/ui/     # shadcn components (vendored by the shadcn CLI)
 │   ├── components/assistant-ui/ # assistant-ui registry components (vendored)
-│   ├── components/        # our own components (bottom-bar, screen-header)
+│   ├── components/        # our own components (bottom-bar, top-bar, chottu-avatar)
 │   ├── hooks/             # app hooks + hooks pulled in by registry components
 │   ├── lib/utils.ts       # `cn()` helper
 │   ├── lib/id.ts          # `newId()`; use it, never `crypto.randomUUID`
