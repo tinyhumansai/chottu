@@ -693,7 +693,8 @@ const AssistantMessage: FC = () => {
     >
       <div
         data-slot="aui_assistant-message-content"
-        className="text-foreground px-2 leading-relaxed wrap-break-word"
+        // Chottu: replies sit in a bubble, like the user's messages.
+        className="bg-muted text-foreground w-fit max-w-[90%] rounded-[1.25rem] px-4 py-2.5 leading-relaxed wrap-break-word empty:hidden [&_p:first-child]:mt-0 [&_p:last-child]:mb-0"
       >
         <MessagePrimitive.GroupedParts groupBy={groupBy}>
           {({ part, children }) => {
@@ -883,7 +884,7 @@ const UserMessage: FC = () => {
       <UserMessageAttachments />
 
       <div className="aui-user-message-content-wrapper relative col-start-2 min-w-0">
-        <div className="aui-user-message-content peer bg-muted text-foreground rounded-(--composer-radius) px-4 py-2 wrap-break-word empty:hidden">
+        <div className="aui-user-message-content peer bg-bubble-user text-bubble-user-foreground rounded-[1.25rem] px-4 py-2.5 wrap-break-word empty:hidden">
           <MessagePrimitive.Parts
             components={{ File: UserFilePart, Image: UserImagePart }}
           />
