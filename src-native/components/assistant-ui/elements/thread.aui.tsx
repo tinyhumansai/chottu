@@ -1,8 +1,6 @@
-import {
 import { VoiceNotePart } from "@/voice-notes/message-part";
 import { VOICE_NOTE } from "@/voice-notes/types";
-  ComposerAddAttachment,
-  ComposerAttachments,
+import {
   UserMessageAttachments,
 } from "@/components/assistant-ui/elements/attachment.aui";
 import {
