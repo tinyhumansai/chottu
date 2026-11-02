@@ -5,9 +5,11 @@ import { createSwitch } from '@gluestack-ui/core/switch/creator';
 import { tva } from '@gluestack-ui/utils/nativewind-utils';
 import { withStyleContext } from '@gluestack-ui/utils/nativewind-utils';
 import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+import { withUniwind } from 'uniwind';
 
+// Chottu: RN's Switch has no `className`; withUniwind adds it, as the other components do.
 const UISwitch = createSwitch({
-  Root: withStyleContext(RNSwitch),
+  Root: withStyleContext(withUniwind(RNSwitch)),
 });
 
 const switchStyle = tva({
