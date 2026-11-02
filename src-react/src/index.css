@@ -169,3 +169,19 @@
   background-image: var(--chat-pattern);
   background-size: 160px 160px;
 }
+
+/*
+ * Space reserved for the floating nav (see components/app-nav.tsx).
+ * Phones: bottom bar = 3rem tabs + 0.75rem padding + 2px border + 1rem gap.
+ * Desktop (md+): left sidebar = 1rem gap + 3rem tabs + 0.75rem padding + 2px border + 0.75rem.
+ */
+:root {
+  --nav-bottom-space: calc(4.75rem + 2px + env(safe-area-inset-bottom));
+  --nav-left-space: 0px;
+}
+@media (width >= 48rem) {
+  :root {
+    --nav-bottom-space: 0px;
+    --nav-left-space: calc(5.5rem + 2px);
+  }
+}
