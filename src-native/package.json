@@ -20,6 +20,8 @@
     "@gluestack-ui/utils": "^5.0.6",
     "@legendapp/motion": "^2.5.3",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@tauri-apps/api": "^2.12.4",
+    "@tauri-apps/plugin-deep-link": "^2.6.3",
     "cn": "^0.5.1",
     "expo": "~58.0.22",
     "expo-audio": "~58.0.11",
