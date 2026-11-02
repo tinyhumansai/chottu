@@ -22,7 +22,6 @@ import {
 import {
   ShimmerLabel,
   useAnnounce,
-  useHydrated,
   webLiveRegion,
 } from "@/components/assistant-ui/elements/surfaces";
 import { ToolFallback } from "@/components/assistant-ui/elements/tool-fallback";
@@ -117,6 +116,8 @@ export type ThreadComponents = {
   Rail?: ComponentType | undefined;
   /** Chottu: shown in the composer in place of send while it is empty (the voice note mic). */
   ComposerExtra?: ComponentType | undefined;
+  /** Chottu: drawn over the whole composer row (the voice note recording bar); renders null when idle. */
+  ComposerOverlay?: ComponentType | undefined;
 };
 
 export type ThreadHistory = {
@@ -684,7 +685,7 @@ const DefaultComposerInput: FC = () => {
 };
 
 const Composer: FC = () => {
-  const { ComposerInput = DefaultComposerInput } = useContext(
+  const { ComposerInput = DefaultComposerInput, ComposerOverlay } = useContext(
     ThreadComponentsContext,
   );
 
@@ -694,6 +695,7 @@ const Composer: FC = () => {
       <View className="aui-composer-shell border-border/60 bg-glass relative min-h-[46px] flex-row items-end gap-1 rounded-[23px] border p-1 shadow-md">
         <ComposerInput />
         <ComposerAction />
+        {ComposerOverlay && <ComposerOverlay />}
       </View>
     </ComposerPrimitive.Root>
   );
@@ -709,7 +711,6 @@ const ComposerAction: FC = () => {
   );
 
   return (
-    // Chottu: no `relative` here, so the voice note recording bar covers the whole composer.
     <View className="aui-composer-action-wrapper flex-row items-center">
       <View className="flex-row items-center gap-1.5">
         {ComposerExtra && (

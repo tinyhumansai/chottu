@@ -8,7 +8,7 @@ import { TopBar } from "@/components/top-bar";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCallStore } from "@/store/call";
 import { useChatStore, type ChatMessage, type ChatPart } from "@/store/chat";
-import { VoiceNoteButton } from "@/voice-notes/composer-button";
+import { VoiceNoteButton, VoiceNoteRecorderProvider, VoiceNoteRecordingBar } from "@/voice-notes/composer-button";
 import { VoiceNoteDataUI } from "@/voice-notes/message-part";
 
 const statusOf = (m: ChatMessage, isStreaming: boolean): ThreadMessageLike["status"] => {
@@ -27,7 +27,7 @@ function Welcome() {
   );
 }
 
-const THREAD_COMPONENTS = { ComposerExtra: VoiceNoteButton, Welcome };
+const THREAD_COMPONENTS = { ComposerExtra: VoiceNoteButton, ComposerOverlay: VoiceNoteRecordingBar, Welcome };
 
 /** The conversation, rendered by assistant-ui over the chat store. */
 export function ChatScreen() {
@@ -55,10 +55,12 @@ export function ChatScreen() {
   return (
     <AssistantRuntimeProvider runtime={runtime}>
       <ChatWallpaper>
-        <Thread
-          components={THREAD_COMPONENTS}
-          insets={{ top: safe.top + TOP_BAR_SPACE, bottom: nav.wide ? Math.max(safe.bottom, 12) : nav.bottom }}
-        />
+        <VoiceNoteRecorderProvider>
+          <Thread
+            components={THREAD_COMPONENTS}
+            insets={{ top: safe.top + TOP_BAR_SPACE, bottom: nav.wide ? Math.max(safe.bottom, 12) : nav.bottom }}
+          />
+        </VoiceNoteRecorderProvider>
         <TopBar onCall={startCall} />
         <VoiceNoteDataUI />
       </ChatWallpaper>
