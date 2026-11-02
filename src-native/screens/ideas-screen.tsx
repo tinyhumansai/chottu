@@ -1,6 +1,8 @@
 import { BellIcon, CalendarClockIcon, LightbulbIcon, SparklesIcon, XIcon } from "lucide-react-native";
+import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { Card, EmptyState, Page, Section } from "@/components/page";
+import { Card, EmptyState, Page } from "@/components/page";
+import { TopTabs, type TopTab } from "@/components/top-tabs";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Divider } from "@/components/ui/divider";
 import { Icon } from "@/components/ui/icon";
@@ -14,17 +16,34 @@ const selectSuggestions = selectByKind("suggestion");
 const selectSchedules = selectByKind("schedule");
 const selectNotifications = selectByKind("notification");
 
-/** Everything Chottu brings up on its own: suggestions, schedules (crons) and notifications. */
+type IdeasTab = "suggestions" | "schedules" | "notifications";
+
+/**
+ * Everything Chottu brings up on its own, one tab each: suggestions,
+ * schedules (crons) and notifications.
+ */
 export function IdeasScreen() {
+  const [tab, setTab] = useState<IdeasTab>("suggestions");
   const ideas = useIdeasStore((s) => s.ideas);
   const { dismiss, toggleSchedule, markRead } = useIdeasStore.getState();
   const suggestions = selectSuggestions({ ideas });
   const schedules = selectSchedules({ ideas });
   const notifications = selectNotifications({ ideas });
 
+  const tabs: readonly TopTab<IdeasTab>[] = [
+    { id: "suggestions", label: "Suggestions", count: suggestions.length },
+    { id: "schedules", label: "Schedules", count: schedules.filter((s) => s.enabled).length },
+    { id: "notifications", label: "Notifications", count: notifications.filter((n) => !n.read).length },
+  ];
+
   return (
-    <Page title="Ideas" subtitle="What Chottu noticed, and what it runs for you.">
-      <Section title="Suggestions">
+    <Page
+      title="Ideas"
+      subtitle="What Chottu noticed, and what it runs for you."
+      toolbar={<TopTabs tabs={tabs} current={tab} onSelect={setTab} accessibilityLabel="Ideas" />}
+    >
+      {tab === "suggestions" && (
+      <View className="gap-2">
         {suggestions.length === 0 && <EmptyState icon={LightbulbIcon} text="You're all caught up." />}
         {suggestions.map((s) => (
           <Card key={s.id} className="gap-2 p-4">
@@ -52,9 +71,10 @@ export function IdeasScreen() {
             </View>
           </Card>
         ))}
-      </Section>
+      </View>
+      )}
 
-      <Section title="Schedules">
+      {tab === "schedules" &&
         {schedules.length === 0 ? (
           <EmptyState icon={CalendarClockIcon} text="Nothing scheduled." />
         ) : (
@@ -76,9 +96,8 @@ export function IdeasScreen() {
             ))}
           </Card>
         )}
-      </Section>
 
-      <Section title="Notifications">
+      {tab === "notifications" &&
         {notifications.length === 0 ? (
           <EmptyState icon={BellIcon} text="No notifications." />
         ) : (
@@ -106,7 +125,6 @@ export function IdeasScreen() {
             ))}
           </Card>
         )}
-      </Section>
     </Page>
   );
 }

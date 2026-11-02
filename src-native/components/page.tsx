@@ -8,23 +8,46 @@ import { Icon } from "@/components/ui/icon";
 import { cn } from "@/lib/utils";
 import { useNavInsets } from "./layout";
 
+type PageProps = {
+  title: string;
+  subtitle?: string;
+  /** Pinned under the title (e.g. tabs); only the content below it scrolls. */
+  toolbar?: ReactNode;
+  children: ReactNode;
+};
+
 /** A scrolling tab page with a large title. Content runs under the floating nav. */
-export function Page({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
+export function Page({ title, subtitle, toolbar, children }: PageProps) {
   const insets = useSafeAreaInsets();
   const nav = useNavInsets();
+  const sides = { paddingLeft: nav.left + 16, paddingRight: 16 };
+  const heading = (
+    <View className="gap-1">
+      <Heading size="3xl">{title}</Heading>
+      {subtitle && <Text className="text-muted-foreground">{subtitle}</Text>}
+    </View>
+  );
+
   return (
-    <ScrollView
-      className="bg-background flex-1"
-      contentContainerStyle={{ paddingTop: insets.top + 24, paddingBottom: nav.bottom + 24, paddingLeft: nav.left + 16, paddingRight: 16 }}
-    >
-      <View className="mx-auto w-full max-w-[44rem] gap-6">
-        <View className="gap-1">
-          <Heading size="3xl">{title}</Heading>
-          {subtitle && <Text className="text-muted-foreground">{subtitle}</Text>}
+    <View className="bg-background flex-1">
+      {toolbar && (
+        <View style={{ ...sides, paddingTop: insets.top + 24, paddingBottom: 12 }}>
+          <View className="mx-auto w-full max-w-[44rem] gap-4">
+            {heading}
+            {toolbar}
+          </View>
         </View>
-        {children}
-      </View>
-    </ScrollView>
+      )}
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{ ...sides, paddingTop: toolbar ? 8 : insets.top + 24, paddingBottom: nav.bottom + 24 }}
+      >
+        <View className="mx-auto w-full max-w-[44rem] gap-6">
+          {!toolbar && heading}
+          {children}
+        </View>
+      </ScrollView>
+    </View>
   );
 }
 
