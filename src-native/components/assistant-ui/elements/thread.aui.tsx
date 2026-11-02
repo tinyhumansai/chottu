@@ -264,13 +264,15 @@ export const Thread: FC<ThreadProps> = ({
               event.nativeEvent;
             pinnedRef.current =
               contentSize.height - layoutMeasurement.height - contentOffset.y <
-              48;
+              120;
           },
+          // After layout settles, or the scroll lands short of the new end.
           onContentSizeChange: () => {
             if (pinnedRef.current)
-              listRef.current?.scrollToEnd({ animated: false });
+              requestAnimationFrame(() =>
+                listRef.current?.scrollToEnd({ animated: false }),
+              );
           },
-          scrollEventThrottle: 32,
         }
       : {};
 
