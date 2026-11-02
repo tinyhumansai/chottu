@@ -1,15 +1,13 @@
 'use client';
 import React from 'react';
-import { Switch as RNSwitch } from 'react-native';
+import { Switch as RNSwitch, View } from 'react-native';
 import { createSwitch } from '@gluestack-ui/core/switch/creator';
 import { tva } from '@gluestack-ui/utils/nativewind-utils';
 import { withStyleContext } from '@gluestack-ui/utils/nativewind-utils';
 import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
-import { withUniwind } from 'uniwind';
 
-// Chottu: RN's Switch has no `className`; withUniwind adds it, as the other components do.
 const UISwitch = createSwitch({
-  Root: withStyleContext(withUniwind(RNSwitch)),
+  Root: withStyleContext(RNSwitch),
 });
 
 const switchStyle = tva({
@@ -30,12 +28,12 @@ const Switch = React.forwardRef<
   React.ComponentRef<typeof UISwitch>,
   ISwitchProps
 >(function Switch({ className, size = 'md', ...props }, ref) {
+  // Chottu: the switch creator's root type has no `className`, so the size
+  // and state classes go on a wrapper.
   return (
-    <UISwitch
-      ref={ref}
-      {...props}
-      className={switchStyle({ size, class: className })}
-    />
+    <View className={switchStyle({ size, class: className })}>
+      <UISwitch ref={ref} {...props} />
+    </View>
   );
 });
 
