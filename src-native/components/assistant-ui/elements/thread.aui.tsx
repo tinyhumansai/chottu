@@ -114,6 +114,8 @@ export type ThreadComponents = {
   ComposerInput?: ComponentType | undefined;
   /** Overlays the message list, which keeps a gutter free along its left edge for it; it reads the list through `useThreadViewport`. Mounting or unmounting it remounts the list. */
   Rail?: ComponentType | undefined;
+  /** Chottu: shown in the composer in place of send while it is empty (the voice note mic). */
+  ComposerExtra?: ComponentType | undefined;
 };
 
 export type ThreadHistory = {
@@ -127,6 +129,8 @@ export type ThreadHistory = {
 
 export type ThreadProps = {
   components?: ThreadComponents | undefined;
+  /** Chottu: room taken by floating chrome over the thread (top bar, tab bar), safe areas included. */
+  insets?: { top: number; bottom: number } | undefined;
   /** A windowed thread: the list asks for older messages when it reaches its start and shows the loading edge above them. Omit it to page through the runtime's `thread.hasEarlier` and `loadEarlier()`. */
   history?: ThreadHistory | undefined;
 };
@@ -221,6 +225,7 @@ const copyToClipboard = async (text: string) => {
 export const Thread: FC<ThreadProps> = ({
   components = EMPTY_COMPONENTS,
   history,
+  insets: chrome,
 }) => {
   const aui = useAui();
   const isEmpty = useAuiState(isNewChatView);
@@ -380,7 +385,7 @@ export const Thread: FC<ThreadProps> = ({
   return (
     <ThreadComponentsContext.Provider value={components}>
       <ThreadViewportContext.Provider value={viewport}>
-        <ThreadPrimitive.Root className="aui-root aui-thread-root bg-background flex-1">
+        <ThreadPrimitive.Root className="aui-root aui-thread-root flex-1 bg-transparent" // Chottu: the wallpaper shows through>
           <KeyboardAvoidingView
             className="flex-1"
             behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -414,9 +419,11 @@ export const Thread: FC<ThreadProps> = ({
                   ref={listRef}
                   className="aui-message-group flex-1"
                   contentContainerClassName={cn(
-                    "gap-6 px-4 pt-4 pb-6",
+                    "gap-3 px-3 pt-4 pb-4",
                     Rail && "pl-10",
                   )}
+                  // Chottu: messages scroll under the floating top bar.
+                  contentContainerStyle={chrome ? { paddingTop: chrome.top + 8 } : undefined}
                   showsVerticalScrollIndicator={false}
                   keyboardDismissMode="interactive"
                   keyboardShouldPersistTaps="handled"
@@ -440,8 +447,9 @@ export const Thread: FC<ThreadProps> = ({
                 </ThreadPrimitive.MessagesFlatList>
               </AuiIf>
               <View
-                className="aui-thread-viewport-footer gap-4 px-4"
-                style={{ paddingBottom: insets.bottom + 8 }}
+                className="aui-thread-viewport-footer gap-4 px-2"
+                // Chottu: the composer floats just above the tab bar.
+                style={{ paddingBottom: chrome ? chrome.bottom + 8 : insets.bottom + 8 }}
               >
                 <Composer />
                 <AuiIf
