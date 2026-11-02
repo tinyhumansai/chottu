@@ -2,6 +2,7 @@ import type { ThreadMessageLike } from "@assistant-ui/react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { backend, type ChatTurn } from "@/backend";
+import { newId } from "@/lib/id";
 
 /** Any part assistant-ui can render: text, image, file, reasoning, tool-call, data-*. */
 export type ChatPart = Exclude<ThreadMessageLike["content"], string>[number];
@@ -43,7 +44,7 @@ type ChatState = {
 let controller: AbortController | null = null;
 
 const toMessage = ({ role, content, id, createdAt }: NewMessage): ChatMessage => ({
-  id: id ?? crypto.randomUUID(),
+  id: id ?? newId(),
   role,
   content: typeof content === "string" ? [{ type: "text", text: content }] : content,
   createdAt: createdAt ?? Date.now(),
