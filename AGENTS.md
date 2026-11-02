@@ -105,8 +105,9 @@ cargo clippy --workspace --all-targets
 
 `pnpm desktop <cmd>` and `pnpm mobile <cmd>` forward any Tauri CLI command to
 the right crate by setting `TAURI_APP_PATH`, for example
-`pnpm desktop add <plugin>`. Run plain `pnpm tauri` only when you set
-`TAURI_APP_PATH` yourself; with two Tauri crates in the tree it has no default.
+`pnpm desktop add <plugin>`. Avoid plain `pnpm tauri` unless you set
+`TAURI_APP_PATH` yourself; with two Tauri crates in the tree it can pick the
+wrong one.
 
 Before reporting work done, run at least `pnpm build` and
 `cargo clippy --workspace --all-targets` and read their output. For UI
