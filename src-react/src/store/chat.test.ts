@@ -56,4 +56,38 @@ describe("chat store", () => {
       ["assistant", "Hello"],
     ]);
   });
+
+  it("a send while a reply is streaming stops that reply and is not dropped", async () => {
+    let release!: () => void;
+    const gate = new Promise<void>((r) => (release = r));
+    vi.doMock("@/backend", () => ({
+      backend: {
+        async *streamReply(history: { text: string }[], signal: AbortSignal) {
+          if (history.at(-1)?.text === "first") {
+            yield "partial";
+            await Promise.race([gate, new Promise((_, rej) => signal.addEventListener("abort", () => rej(signal.reason)))]);
+          }
+          yield "done";
+        },
+      },
+    }));
+    insecureContext();
+    const { useChatStore, textOf } = await import("./chat");
+
+    const first = useChatStore.getState().send("first");
+    await vi.waitFor(() => expect(textOf(useChatStore.getState().messages.at(-1)!)).toBe("partial"));
+    await useChatStore.getState().send("second");
+    release();
+    await first;
+
+    const { messages, isRunning } = useChatStore.getState();
+    expect(isRunning).toBe(false);
+    expect(messages.map((m) => [m.role, textOf(m), m.error ?? null])).toEqual([
+      ["user", "first", null],
+      ["assistant", "partial", "cancelled"],
+      ["user", "second", null],
+      ["assistant", "done", null],
+    ]);
+  });
 });
+
