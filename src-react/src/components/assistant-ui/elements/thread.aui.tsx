@@ -241,7 +241,8 @@ const ThreadRoot: FC<{ isEmpty: boolean; autoFocus: boolean }> = ({
       >
         <div
           className={cn(
-            "mx-auto flex w-full max-w-(--thread-max-width) flex-1 flex-col px-4 pt-4",
+            // Chottu: top inset is a variable so a floating top bar can sit over the thread.
+            "mx-auto flex w-full max-w-(--thread-max-width) flex-1 flex-col px-4 pt-(--thread-top-inset,1rem)",
             isEmpty && "justify-center",
           )}
         >
