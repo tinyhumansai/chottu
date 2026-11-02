@@ -856,7 +856,7 @@ const AssistantMessage: FC = () => {
     <MessagePrimitive.Root className="aui-assistant-message-root">
       <MessageActionsRow side="start" actions={<AssistantActionBar />}>
       {/* Chottu: replies sit in a bubble too. */}
-      <View className="aui-assistant-message-content bg-bubble-assistant max-w-[85%] shrink rounded-[20px] px-4 py-2 shadow-sm">
+      <View className="aui-assistant-message-content bg-bubble-assistant max-w-[85%] rounded-[20px] px-4 py-2 shadow-sm">
         <MessagePrimitive.GroupedParts groupBy={groupBy}>
           {({ part, children }) => {
             switch (part.type) {
@@ -926,7 +926,7 @@ const MessageActionsRow: FC<{
       onLongPress={() => setShown((v) => !v)}
       delayLongPress={350}
       className={cn(
-        "web:cursor-auto flex-row items-end gap-1",
+        "web:cursor-auto w-full flex-row items-end gap-1",
         side === "end" && "flex-row-reverse",
       )}
     >
@@ -989,7 +989,7 @@ const UserMessage: FC = () => (
     <AuiIf condition={(s) => s.message.parts.length > 0}>
       <MessageActionsRow side="end" actions={<UserActionBar />}>
       {/* Chottu: user bubble colours, and voice notes render in user messages too. */}
-      <View className="aui-user-message-content bg-bubble-user max-w-[85%] shrink rounded-[20px] px-4 py-2 shadow-sm">
+      <View className="aui-user-message-content bg-bubble-user max-w-[85%] rounded-[20px] px-4 py-2 shadow-sm">
         <MessagePrimitive.Parts
           components={{
             Text: UserText,

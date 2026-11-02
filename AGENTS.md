@@ -92,7 +92,12 @@ src-tauri-desktop/         # crate `chottu-desktop`, binary `chottu`
   to edit, but keep edits small and mark each with a `Chottu:` comment saying
   why, so a later registry update can be merged. The thread
   (`thread.aui.tsx`) takes Chottu's `insets` prop and `ComposerExtra` /
-  `ComposerOverlay` slots that way.
+  `ComposerOverlay` slots that way, and its message actions (copy, retry,
+  edit) sit beside the bubble, shown on hover or long press, never under
+  every message.
+- Pages are `Page` from `components/page.tsx`. A page that switches between
+  views passes `TopTabs` as its `toolbar`, which stays pinned under the title
+  while the content scrolls (see the Ideas screen).
 - Import through the `@/` alias, not long relative paths.
 - Style with Tailwind classes (Uniwind). Every colour is a token in
   `global.css`, declared directly as `--color-*` under `@layer theme` with a

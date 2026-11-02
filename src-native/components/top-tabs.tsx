@@ -30,16 +30,17 @@ export function TopTabs<T extends string>({ tabs, current, onSelect, accessibili
             accessibilityLabel={count > 0 ? `${tab.label}, ${count}` : tab.label}
             onPress={() => onSelect(tab.id)}
             className={cn(
-              "flex-1 flex-row items-center justify-center gap-1.5 rounded-full px-2 py-2",
+              // Sized to their labels (not equal thirds) so long labels fit on a phone.
+              "grow flex-row items-center justify-center gap-1 rounded-full px-2 py-2",
               selected ? "bg-background shadow-sm" : "active:bg-accent web:hover:bg-accent",
             )}
           >
-            <Text numberOfLines={1} className={cn("text-sm", selected ? "text-foreground font-semibold" : "text-muted-foreground")}>
+            <Text numberOfLines={1} className={cn("text-[13px]", selected ? "text-foreground font-semibold" : "text-muted-foreground")}>
               {tab.label}
             </Text>
             {count > 0 && (
-              <View className={cn("min-w-5 items-center rounded-full px-1.5", selected ? "bg-primary" : "bg-muted")}>
-                <Text className={cn("text-xs leading-5 font-semibold", selected ? "text-primary-foreground" : "text-muted-foreground")}>
+              <View className={cn("min-w-[18px] items-center rounded-full px-1", selected ? "bg-primary" : "bg-muted")}>
+                <Text className={cn("text-[11px] leading-[18px] font-semibold", selected ? "text-primary-foreground" : "text-muted-foreground")}>
                   {count}
                 </Text>
               </View>
